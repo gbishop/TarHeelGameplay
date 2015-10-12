@@ -12,53 +12,59 @@ function ytVideoId(id_or_url) {
 var slug = null;
 var videoID = '';
 
+function saveGameplay(gp) {
+    var $errors = $('div#errors'),
+        $messages = $('div#messages');
+    $errors.empty();
+    $messages.empty();
+
+    // validate title
+    var method = 'create_post',
+        args = {
+            title: gp.title,
+            content: gp.vocabulary,
+            categories: 'Gameplays',
+            tags: 'error free',
+            'custom[ytid]': gp.ytid,
+            'custom[link]': gp.link,
+            'custom[duration]': intval((gp.duration+30)/60),
+            status: 'publish'
+        };
+    if (gp.slug) {
+        args.slug = gp.slug;
+        method = 'update_post';
+    }
+    // get the nonce
+    $.get('/api/get_nonce/', {
+            controller: 'posts',
+            method: method })
+    .done(function(res) {
+        console.log('nonce', res.nonce);
+        args.nonce = res.nonce;
+        // create the new post
+        $.post('/api/posts/' + method + '/', args)
+        .done(function(r) {
+            console.log('cp', r);
+            $messages.append(slug ? 'Gameplay updated' : 'Gameplay saved');
+        }).error(function(e) {
+            $errors.append('Save failed');
+        });
+    });
+}
+
 $(function() {
     var $q = $('#quick');
-    function saveGameplay(e) {
-        e.preventDefault();
-        var $errors = $q.find('div#errors'),
-            $messages = $q.find('div#errors');
-        $errors.empty();
-        $messages.empty();
-
-        // validate title
-        var title = $q.find("input[name='title']").val(),
-            rating = $q.find("select[name='rating']").val(),
-            ytid = $q.find("input[name='video']").val(),
-            message = $q.find("input[name='message']").val(),
-            $gp = $q.find('#quick-gameplay'),
-            link = $gp.attr('action') + '?' + $gp.serialize();
-        // get the nonce
-        var method = 'create_post',
-            args = {
-                title: title,
-                content: message,
-                categories: 'Gameplay',
-                tags: 'error free',
-                format: 'video',
-                'custom[ytid]': ytid,
-                'custom[link]': link,
-                status: 'publish'
+    function extractGameplay() {
+        // validate all of these
+        var $form = $q.find('#quick-gameplay'),
+            g = {
+                title: $("input[name='title']").val(),
+                rating: $("select[name='rating']").val(),
+                ytid: $q.find("input[name='video']").val(),
+                vocabulary: $q.find("input[name='message']").val(),
+                link: $form.attr('action') + '?' + $form.serialize()
             };
-        if (slug) {
-            args['slug'] = slug;
-            method = 'update_post';
-        }
-        $.get('/api/get_nonce/', {
-                controller: 'posts',
-                method: method })
-        .done(function(res) {
-            console.log('nonce', res.nonce);
-            args.nonce = res.nonce;
-            // create the new post
-            $.post('/api/posts/' + method + '/', args)
-            .done(function(r) {
-                console.log('cp', r);
-                $messages.append(slug ? 'Gameplay updated' : 'Gameplay saved');
-            }).error(function(e) {
-                $errors.append('Save failed');
-            });
-        });
+        return g;
     }
 
     function enablePlay() {
@@ -66,13 +72,13 @@ $(function() {
             $q.find("input[name='interval']").val() &&
             $q.find("input[name='message']").val();
 
-        $q.find('#qplay').prop('disabled', !ok);
+        $q.find('button.play').prop('disabled', !ok);
     }
 
     function enableSave() {
         var ok = $q.find("input[name='title']").val() &&
-            !$('#qplay').prop('disabled');
-        $q('#save').prop('disabled', !ok);
+            !$q.find('button.play').prop('disabled');
+        $('#save').prop('disabled', !ok);
     }
 
     var $video = $q.find("input[name='video']");
@@ -82,10 +88,14 @@ $(function() {
     });
     $q.find('#quick-gameplay input').on('change', enablePlay);
     $q.find('input').on('keyup', enablePlay);
-    $q.find('#save-gameplay input').on('change', enableSave);
-    $q.find('#save-gameplay').on('submit', saveGameplay);
 
-
+    // move these out of here
+    //$('#save-gameplay input').on('change', enableSave);
+    $q.on('save', function(e, saveFunc) {
+        e.preventDefault();
+        var g = extractGameplay();
+        saveFunc(g);
+    });
 });
 
 function onYouTubeIframeAPIReady() {
@@ -107,33 +117,59 @@ $(function() {
     });
 });
 
+function createTimepoint(time, type, prompt, $item) {
+    var v = {
+        type: type,
+        time: time.toFixedDown(1),
+        timeLabel: type=='start' ? 'Start at' : 'Pause at'
+    };
+    if (type == 'single') {
+        v.message = prompt;
+        v.single = true;
+    } else if (type == 'multiple') {
+        v.prompts = prompt;
+        v.multiple = true;
+    }
+    console.log(v);
+    $item = $(ich.timepoint(v));
+    console.log($item);
+    return $item;
+}
+
+
 $(function() {
-    var $a = $('#advanced');
+    var $a = $('#precise');
 
     var player;
+
+    var $video = $a.find("input[name='video']");
+
+    $video.on('change', function(e) {
+        fixupVideoId();
+    });
+
+    function fixupVideoId() {
+        var v = ytVideoId($video.val());
+        $video.val(v);
+        return v;
+    }
+
     function loadVideo() {
-        videoId = $a.find("input[name='video']").val();
+        videoId = fixupVideoId();
         console.log(videoId);
-        var regExp = /^.*(youtube\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-        var match = videoId.match(regExp);
-        console.log(match);
-        if (match && match[2].length == 11) {
-          videoId = match[2];
-        }
-        console.log(videoId);
-        player = new YT.Player('player', {
+        player = new YT.Player($a.find('.player').get(0), {
             //height: "30em",
             //width: "40em",
             videoId: videoId,
+            playerVars: {
+                iv_load_policy: 3
+            },
             events: {
                 'onReady': function() {
                     console.log('player ready');
                     //player.seekTo(0.0, true);
                     //player.pauseVideo();
                     initTimepoints();
-                    setInterval(showTime, 100);
-                    $a.find('#controls').show();
-                    $a.find('#tp-editor').show();
                 },
                 'onStateChange': onPlayerStateChange
             }
@@ -144,28 +180,17 @@ $(function() {
     function initTimepoints() {
         duration = player.getDuration();
         console.log('duration', duration);
-        var $tp = $a.find('#timepoints');
+        var $tp = $a.find('.timepoints');
         $tp.find('li:gt(0)').remove();
         //$tp.append(createTimepoint(0.0, 'start', []));
         //$tp.append(createTimepoint(0.0, 'stop', [{message:'foo'},{message: 'bar', target: 10}]));
-        $a.find('#aplay').attr('disabled', false);
+        $a.find('.play').attr('disabled', false);
         player.playVideo();
     }
 
-    function createTimepoint(time, type, prompts, $item) {
-        var v = {
-            type: type,
-            time: time,
-            prompts: prompts,
-            timeLabel: type=='start' ? 'Start at' : 'Pause at'
-        };
-        $item = $(ich.timepoint(v));
-        return $item;
-    }
-
     function insertTimepoint($tp) {
-        $a.find('#timepoints').append($item);
-        return $item;
+        $a.find('.timepoints').append($tp);
+        return $tp;
     }
 
     function stepVideo(amt) {
@@ -192,25 +217,14 @@ $(function() {
         return m ? parseFloat(m[1]) : this.valueOf();
     };
 
-    function showTime() {
-        var t = player.getCurrentTime();
-        t = t.toFixedDown(1);
-        $a.find('#current-time').val(t);
+    function scrollIntoView($tp) {
+        $tp.parent().scrollTop($tp.offset().top);
     }
-
     function addTimepoint() {
-        var t = parseFloat($('#current-time').val());
-        var m = $a.find('#message').val();
-        var $tp = createTimepoint(t, 'stop', m);
-        var $tps = $a.find('#timepoints');
-        $tps.append($tp);
-        setSelectedTimepoint($tp);
-    }
-
-    function updateTimepoint($tp) {
-        var t = parseFloat($('#current-time').val());
-        var m = $a.find('#message').val();
-        createTimepoint(t, $tp.data('tp').type, m, $tp);
+        var t = player.getCurrentTime();
+        var $tp = createTimepoint(t, 'single', '');
+        insertTimepoint($tp);
+        scrollIntoView($tp);
     }
 
     function deleteTimepoint() {
@@ -221,7 +235,7 @@ $(function() {
         setSelectedTimepoint(null);
     }
 
-    function play() {
+    function getPlayLink() {
         var tps = [],
             mis = [],
             messages = [];
@@ -234,22 +248,20 @@ $(function() {
             return mi;
         }
         // sort the timepoints
-        var $tps = $("#timepoints");
+        var $tps = $a.find(".timepoints");
         $tps.children().detach().sort(function(a, b) {
-            var ta = $(a).data('tp').time,
-                tb = $(b).data('tp').time;
+            var ta = parseFloat($(a).find('input[name=time]').val()),
+                tb = parseFloat($(b).find('input[name=time]').val());
             return ta==tb ? 0 : (ta > tb) ? 1 : -1;
         }).appendTo($tps);
         $tps.children().each(function() {
             var $this = $(this),
-                tp = $this.data('tp');
+                time = parseFloat($this.find('input[name=time]').val()),
+                message = $this.find('input[name=message]').val();
+            if (!message) message = "";
             // get message index
-            if (typeof(tp.prompt) === 'string') {
-                mis.push(getMessageIndex(tp.prompt));
-            } else {
-                mis.push(tp.prompt.map(getMessageIndex));
-            }
-            tps.push(tp.time);
+            mis.push(getMessageIndex(message));
+            tps.push(time);
         });
         var res = {
             t: tps,
@@ -258,55 +270,94 @@ $(function() {
             v: videoId
         };
         var url = '/app2/gameplay.html?' + URLON.stringify(res);
+        return url;
+    }
+
+    function play() {
+        var url = getPlayLink();
         console.log('url', url);
         window.open(url, videoId);
     }
 
-    var $selectedTimepoint = null;
-    function setSelectedTimepoint($tp) {
-        $selectedTimepoint = $tp;
-        $a.find('#timepoints li.selected').removeClass('selected');
-        if ($selectedTimepoint) {
-            $selectedTimepoint.addClass('selected');
-            $a.find('#update').attr('disabled', false);
-            $a.find('#delete').attr('disabled', false);
-        } else {
-            $a.find('#update').attr('disabled', true);
-            $a.find('#delete').attr('disabled', true);
+    function extractGameplay() {
+        // validate all of these
+        function unique(array){
+            return array.filter(function(el, index, arr) {
+                return index === arr.indexOf(el);
+            });
         }
+        var messages = $a.find("input[name='message']").map(function() {
+            return $(this).val(); }).get(),
+            vocabulary = unique(messages).join(', '),
+            g = {
+                title: $("input[name='title']").val(),
+                rating: $("select[name='rating']").val(),
+                ytid: $a.find("input[name='video']").val(),
+                duration: duration,
+                vocabulary: vocabulary,
+                link: getPlayLink()
+            };
+        return g;
     }
+
+    $a.on('save', function(e, saveFunc) {
+        e.preventDefault();
+        var g = extractGameplay();
+        console.log('g=', g);
+        saveFunc(g);
+    });
 
     $(document).on('apiReady', function() {
         console.log('apiReady');
-        $a.find('#loadVideo').prop('disabled', false);
+        $a.find('.loadVideo').prop('disabled', false);
     });
 
-    $a.find('#loadVideo').on('click', loadVideo);
-    $a.find('#player-controls button').on('click', function() {
-        var amt = parseFloat(this.dataset.step);
-        stepVideo(amt);
-    });
-    $a.find('#add').on('click', addTimepoint);
-    $a.find('#update').on('click', function() {
-        if (!$selectedTimepoint){
-            return;
+    // allow jogging the video from the various time inputs
+    $('#creator').on('keydown', "input[type='number']", function(evt) {
+        console.log('number kd', evt);
+        if (evt.keyCode == 38 || evt.keyCode == 40) { // up or down arrow
+            evt.preventDefault();
+            var $target = $(evt.target),
+                value = parseFloat($target.val()),
+                step = evt.shiftKey ? 1 : 0.1,
+                sign = evt.keyCode == 38 ? 1 : -1;
+            value = Math.min(player.getDuration(), Math.max(0, value + sign * step));
+            value = Math.round(value * 10) / 10;
+            $target.val(value.toFixed(1));
+            if (player) player.seekTo(value);
+        } else if (evt.keyCode == 13) { // return
+            var $target = $(evt.target),
+                value = parseFloat($target.val());
+            player.seekTo(value);
         }
-        updateTimepoint($selectedTimepoint);
+
+    }).on('focus', "input[type='number']", function(evt) {
+        console.log('focus in', evt);
+        var $target = $(evt.target),
+            value = parseFloat($target.val());
+        if (player) player.seekTo(value);
+        return true;
     });
-    $a.find('#timepoints').append(createTimepoint(0, 'start', []));
-    $a.find('#timepoints').on('click', 'li', function() {
-        var $this = $(this);
-        setSelectedTimepoint($this);
-        var tp = $this.data('tp');
-        player.seekTo(tp.time, true);
-        // fix for multiple prompts
-        $a.find('#message').val(tp.prompt || '');
+
+    $a.find('.timepoints').on('click', 'i.delete-pause', function(e) {
+        $(this).parent().remove();
     });
-    $a.find('#delete').on('click', deleteTimepoint);
-    console.log($a.find('#play'));
-    $a.find('#aplay').on('click', play);
+
+    $a.find('.loadVideo').on('click', loadVideo);
+    $a.find('button.add-pause').on('click', addTimepoint);
+    $a.find('.timepoints').append(createTimepoint(0, 'start', ''));
+    console.log($a.find('.play'));
+    $a.find('.play').on('click', play);
     $a.find('i.fa-info-circle').on('click', function() {
         $(this).next('div.help').toggle();
     });
 
+});
+
+$(function() {
+    $('#save-gameplay').on('submit', function(e) {
+        e.preventDefault();
+        var $tab = $('.tab-content.current');
+        $tab.trigger('save', [saveGameplay])
+    });
 });

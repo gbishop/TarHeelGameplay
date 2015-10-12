@@ -1,9 +1,10 @@
 <div id="creator">
 	<ul class="tabs">
-		<li class="tab-link current" data-tab="quick">Basic</li>
+		<li class="tab-link" data-tab="quick">Basic</li>
+		<li class="tab-link current" data-tab="precise">Precise</li>
 		<li class="tab-link" data-tab="advanced">Advanced</li>
 	</ul>
-	<div id="quick" class="tab-content current">
+	<div id="quick" class="tab-content">
 		<p>On this tab you can quickly create a basic interactive gameplay with a fixed interval between prompts.</p>
 
 		<form action="/app2/gameplay.html" method="get" target="_blank" id="quick-gameplay">
@@ -34,80 +35,80 @@
 		        </label>
 		    </div>
 		    <div>
-		        <button id="qplay" type="submit" disabled class="thr-blue-button">Play</button>
+		        <button class="play" type="submit" disabled class="thr-blue-button">Play</button>
 		    </div>
 		</form>
 	</div>
-	<div id="advanced" class="tab-content">
+	<div id="precise" class="tab-content current">
 		<p>On this tab you may create a Gameplay where you control the time and text for each prompt.</p>
 		<div class="formlike">
 			<div>
 				<label>YouTube Video ID (or URL)
 					<input type="text" name="video" value="https://www.youtube.com/watch?v=ia8bhFoqkVE" />
 				</label>
-				<button id="loadVideo" disabled>Load</button>
+				<button class="loadVideo" disabled>Load</button>
 			</div>
-			<div id="controls">
-			    <div id="player-container">
-			        <div id="player"></div>
-			        <div id="player-controls">
-			            <button data-step="-10">-10</button>
-			            <button data-step="-1">-1</button>
-			            <button data-step="-0.1">-0.1</button>
-			            <button data-step="+0.1">+0.1</button>
-			            <button data-step="+1">+1</button>
-			            <button data-step="+10">+10</button>
-			        </div>
-			        <ul id="timepoints">
-	                <script id="timepoint" type="text/html">
-	                	<li class="tp-{{type}}">
-	                		<i class="picon delete-pause fa fa-trash-o" title="delete pause"></i>
-	                		<div>
-	                		    <label>{{timeLabel}}:
-	                		    	<input type="number" name="current-time" value="{{time}}"
-	                		    		placeholder="Enter time" />
-	                		    </label>
-	                		</div>
-	                		<ol>
-	                			{{#prompts}}
-		                		<li>
-			                		<i class="picon delete-prompt fa fa-trash-o" title="delete prompt"></i>
-			                		<div>
-			                		    <label>Choice:
-			                		    	<input type="text" name="message" value="{{message}}"
-			                		    		placeholder="Enter message" />
-			                		    </label>
-			                		</div>
-			                		<div>
-			                			<label>Action:
-			                				<input type="radio" name="action" value="continue"
-			                					{{^target}}checked{{/target}}
-			                					title="Continue playing the video"/>Continue
-			                				<input type="radio" name="action" value="jump"
-			                					{{#target}}checked{{/target}}
-			                					title="Jump to a new time in the video"/>Jump to:
-			                				<input type="number" name="target" value="{{target}}"
-			                					placeholder="Enter a time" />
-			                			</label>
-			                		</div>
-		                		</li>
-		                		{{/prompts}}
-		                		<button class="add-choice thr-blue-button">Add A Choice</button>
-		                	</ol>
-	                	</li>
-	                </script>
-			        </ul>
-					<button class="add-pause thr-blue-button">Add A Pause</button>
+		    <div class="player-container">
+		        <div class="player"></div>
+				<button class="add-pause thr-blue-button">Add A Pause</button>
+		        <ul class="timepoints">
+                <script id="timepoint" type="text/html">
+                	<li class="tp-{{type}}">
+                		<i class="picon delete-pause fa fa-trash-o" title="delete pause"></i>
+                		<div>
+                		    <label>{{timeLabel}}:
+                		    	<input type="number" name="time" value="{{time}}" step="0.1"
+                		    		placeholder="Enter time" title="Use up and down arrow to adjust the time. Use shift for bigger steps." />
+                		    </label>
+                		</div>
+                		{{#single}}
+                		<div>
+                		    <label>Prompt:
+                		    	<input type="text" name="message" value="{{message}}"
+                		    		placeholder="Enter message" />
+                		    </label>
+                		</div>
+                		{{/single}}
+                		{{#multiple}}
+                		<ol>
+                			{{#prompts}}
+	                		<li>
+		                		<i class="picon delete-prompt fa fa-trash-o" title="delete prompt"></i>
+		                		<div>
+		                		    <label>Choice:
+		                		    	<input type="text" name="message" value="{{message}}"
+		                		    		placeholder="Enter message" />
+		                		    </label>
+		                		</div>
+		                		<div>
+		                			<label>Action:
+		                				<input type="radio" name="action" value="continue"
+		                					{{^target}}checked{{/target}}
+		                					title="Continue playing the video"/>Continue
+		                				<input type="radio" name="action" value="jump"
+		                					{{#target}}checked{{/target}}
+		                					title="Jump to a new time in the video"/>Jump to:
+		                				<input type="number" name="target" value="{{target}}"
+		                					placeholder="Enter a time" />
+		                			</label>
+		                		</div>
+	                		</li>
+	                		{{/prompts}}
+	                		<button class="add-choice thr-blue-button">Add A Choice</button>
+	                	</ol>
+	                	{{/multiple}}
+                	</li>
+                </script>
+		        </ul>
 
-			    </div>
-			</div>
-			<button id="aplay" disabled class="thr-blue-button">Play</button>
+		    </div>
+			<button class="play thr-blue-button">Play</button>
 
 		</div>
 
 	</div>
-	<div id="tab-3" class="tab-content">
-		<p>The advanced creator will appear here</p>
+	<div id="advanced" class="tab-content">
+		<p>The advanced creator will eventually appear here</p>
 	</div>
 
 	<?php if (is_user_logged_in() ): ?>
@@ -129,7 +130,7 @@
 			</div>
 			<div id="errors"></div>
 			<div id="messages"></div>
-			<button id="save" type="submit" disabled class="thr-blue-button">Save</button>
+			<button id="save" type="submit" class="thr-blue-button">Save</button>
 		</form>
 
 	<?php endif; ?>

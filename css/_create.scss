@@ -28,20 +28,18 @@ ul.tabs li.current{
 }
 
 
-#player-container {
+.player-container {
     margin-top: 1em;
     margin-bottom: 1em;
 }
 
-#player-controls {
-    margin-bottom: 4px;
-    font-size: 0.75em;
-}
-
-#timepoints {
+.timepoints {
     list-style: none;
-    margin-left: 0;
-    margin-bottom: 0.5em;
+    margin: 0.5em 0;
+    height: 10em;
+    overflow-y: scroll;
+    border: 1px solid black;
+    padding: 0.1em;
 
     ol {
         margin-top: 0.5em;
@@ -51,6 +49,7 @@ ul.tabs li.current{
         border: 1px solid black;
         padding: 0.5em;
         margin-bottom: 0.2em;
+        margin-left: 0;
     }
 }
 
@@ -61,6 +60,10 @@ ul.tabs li.current{
 
         div + div {
             margin-top: 1em;
+        }
+
+        .tp-single div + div {
+            margin-top: 0;
         }
 
         input, select {
@@ -98,21 +101,29 @@ ul.tabs li.current{
         .tp-start ol {
             display: none;
         }
+
+        .tp-single > div {
+            display: inline-block;
+        }
+
         .tp-start .delete-pause, .tp-start .add-choice {
             display: none;
         }
 
         .add-pause {
-            margin-left: 2.5em;
-            font-size: 0.5em;
+            display: block;
         }
 
-        #player {
+        .player {
             width: 30em;
-            min-height: 20em;
+            min-height: 24em;
             background: black;
             margin-bottom: 0.5em;
         }
 
     }
+}
+
+div.video-annotations {
+    display: none;
 }

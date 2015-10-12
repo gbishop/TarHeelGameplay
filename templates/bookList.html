@@ -1,39 +1,30 @@
     {{#favorites}}
-        {{^books}}
+        {{^gameplays}}
         <p>_(Your favorites page is empty.)</p>
-        {{/books}}
+        {{/gameplays}}
     {{/favorites}}
     {{^favorites}}
-        {{^books}}
-        <p>_(No books found.) <a href="/find/?category=&reviewed=&audience=&page=1">_(Click here to try your search without restrictions.)</a></p>
-        {{/books}}
+        {{^gameplays}}
+        <p>_(No gameplays found.)</p>
+        {{/gameplays}}
     {{/favorites}}
-    <ul class="thr-book-list{{#reviewer}} reviewer{{/reviewer}}">
-        {{#books}}
-        <li class="selectable thr-colors" data-preview="{{preview.url}}" data-id="{{ID}}" lang="{{language}}" data-bust="{{bust}}">
-            <a href="{{link}}" data-type="book">
+    <ul class="thr-book-list">
+        {{#gameplays}}
+        <li class="selectable thr-colors" data-preview="{{preview}}" data-id="{{ID}}" lang="{{language}}" data-bust="{{bust}}">
+            <a href="{{glink}}" target="_blank">
                 <h2>{{title}}</h2>
                 <p class="thr-author">{{author}}</p>
-                {{#rating}}
-                <img src="{{icon}}" class="thr-stars" alt="{{text}}" title="{{text}}" />
-                {{/rating}}
-                {{#reviewed}}
-                <img src="/theme/images/reviewed_t.png" class="thr-reviewed"
-                     alt="_(Reviewed for educational quality.|icon explanatory text)" title="_(Reviewed for educational quality.|icon explanatory text)" />
-                {{/reviewed}}
                 {{#caution}}
                 <img src="/theme/images/caution_t.png" class="thr-caution"
                      alt="_(May not be appropriate for all readers.|icon explanatory text)" title="_(May not be appropriate for all readers.|icon explanatory text)" />
                 {{/caution}}
-                {{#cover}}
-                    <div class="thr-thumb-box">
-                        <img src="{{url}}" class="thr-thumb" style="width:{{pw}}%; height:{{ph}}%; padding-top: {{pm}}%" data-width="{{width}}" data-height="{{height}}" alt=" " />
-                    </div>
-                {{/cover}}
-                <p class="thr-pages">{{pages}}</p>
+                <div class="thr-thumb-box">
+                    <img src="{{thumbnail}}" class="thr-thumb" alt=" " />
+                </div>
+                <p class="thr-pages">{{duration}}</p>
             </a>
             <img src="/theme/images/FavoriteYesOverlay.png" class="favoriteYes" alt=" "/>
             <img src="/theme/images/FavoriteNoOverlay.png" class="favoriteNo" alt=" "/>
         </li>
-        {{/books}}
+        {{/gameplays}}
     </ul>

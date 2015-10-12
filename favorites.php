@@ -6,41 +6,6 @@ GET: Return a list of books that match the query
 */
 ?>
 <?php
-// handle converting old format favorites URL's to new format
-function new_favorites_url($q) {
-    $p = array();
-    if (array_key_exists('books', $q)) {
-        $v = $q['books'];
-        $p[] = "favorites=$v";
-    } else {
-        return favorites_url();
-    }
-    foreach (array('bgcolor'=>'pageColor', 'fgcolor'=>'textColor') as $old=>$new) {
-        if (array_key_exists($old, $q)) {
-            $cname = $q[$old];
-            $c = array('black'=>'000', 'blue'=>'00f', 'green'=>'0f0', 'cyan'=>'0ff', 'red'=>'f00', 'magenta'=>'f0f', 'yellow'=>'ff0', 'white'=>'fff');
-            $d = array('pageColor'=>'fff', 'textColor'=>'000');
-            $v = $c[$cname] ?: $d[$new];
-            $p[] = "$new=$v";
-        }
-    }
-    if (array_key_exists('speech', $q)) {
-        $voice = array('silent', 'child', 'woman', 'man');
-        $v = $voice[$q['speech'] + 0];
-        $p[] = "voice=$v";
-    }
-    $result = '/favorites/?' . implode('&', $p);
-    return $result;
-}
-?>
-<?php
-// redirect on old style favorites URLs to convert them to new style
-if (array_key_exists('books', $_GET)) { // old format URL, convert it before redirect
-    $loc = new_favorites_url($_GET);
-    header('Location: ' . $loc);
-    die();
-}
-
 // redirect on an empty URL so the page is bookmarkable
 if (! array_key_exists('favorites', $_GET) && ! array_key_exists('collection', $_GET) && THR('favorites')) {
     $loc = favorites_url();
@@ -56,8 +21,6 @@ if (array_key_exists('favorites', $_GET) && preg_match('/^[AR]/', $_GET['favorit
 }
 
 // construct the where clause
-$where = array();
-//$where[] = "p.post_status = 'publish'";
 $collection = THR('collection');
 if ($collection) {
     $favorites = $wpdb->get_var($wpdb->prepare("SELECT booklist FROM $collections_table WHERE slug = %s", $collection));
@@ -66,28 +29,35 @@ if ($collection) {
 } else {
     $favorites = THR('favorites');
 }
-if ($favorites) {
-    $where[] = "p.id in (" . $favorites . ")";
-} else {
-    $where[] = "p.id = 0";
-}
+$fav_array = explode($favorites, ',');
 
-$where = 'WHERE ' . implode(' AND ', $where);
-
-$json = array_key_exists('json', $_GET) && $_GET['json'] == 1;
 $count = 24;
 $cp1 = $count + 1; // ask for one more to determine if there are more
 $page = THR('fpage');
 $offset = ($page - 1) * $count;
+$args = array(
+    'post_in'          => $fav_array,
+    'posts_per_page'   => $cp1,
+    'offset'           => $offset,
+    'category'         => '',
+    'category_name'    => 'Gameplays',
+    'orderby'          => 'date',
+    'order'            => 'DESC',
+    'include'          => '',
+    'exclude'          => '',
+    'meta_key'         => '',
+    'meta_value'       => '',
+    'post_type'        => 'post',
+    'post_mime_type'   => '',
+    'post_parent'      => '',
+    'author'       => '',
+    'post_status'      => 'publish'
+);
+$posts = get_posts($args);
 
-$sql = "
-SELECT p.*
-    FROM wpreader_posts p
-    $where
-    LIMIT $offset,$cp1";
+$json = array_key_exists('json', $_GET) && $_GET['json'] == 1;
 
-$posts = $wpdb->get_results($sql);
-$nrows = $wpdb->num_rows;
+$nrows = count($posts);
 
 $result = posts_to_find_results($posts, $nrows, $count);
 
@@ -114,11 +84,6 @@ setTHR('findAnotherLink', '/favorites/');
 <?php
 $view = array();
 $view['searchForm'] = '';
-// edit the data to create the view for the template
-foreach( $result['books'] as &$book ) {
-    $c = &$book['cover'];
-    setImageSizes($c);
-}
 $result['favorites'] = true;
 $view['bookList'] = template_render('bookList', $result);
 if ($page > 1) {

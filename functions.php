@@ -273,12 +273,8 @@ function striptrim_deep($value)
     return $value;
 }
 
-function ParseBookPost($post) {
-    global $LangNameToLangCode, $CategoryAbbrv;
-    global $wpdb, $search_table;
-    global $log;
-
-    if (!$post || !$post->ID || !in_category('books', $post)) {
+function ParseGameplayPost($post) {
+    if (!$post || !$post->ID || !in_category('gameplays', $post)) {
         return false;
     }
 
@@ -286,110 +282,48 @@ function ParseBookPost($post) {
     $author_id = $post->post_author;
 
     $content = $post->post_content;
-    $row = $wpdb->get_row("SELECT * from $search_table WHERE ID = $id");
-    if ($row) {
-        $res = json_decode($row->json, true);
-        $res['reviewed'] = $row->reviewed == 'R';
-        $res['language'] = $row->language;
-
-    } else {
-        // parse the old format
-        $nimages = preg_match_all('/(?:width="(\d+)" height="(\d+)" )?src="([^"]+)"\\/?>([^<]*)/', $post->post_content, $matches);
-        $image_urls = $matches[3];
-        $image_widths = $matches[1];
-        $image_heights = $matches[2];
-        $captions = striptrim_deep(array_slice($matches[4], 1));
-        $title = trim($post->post_title);
-        $pages = array();
-        $pages[] = make_page($title, $image_urls[0]);
-        for($i = 1; $i < count($image_urls); $i++) {
-            $pages[] = make_page($captions[$i-1], $image_urls[$i]);
-        }
-        foreach($pages as $page) {
-            if ($page === false) {
-                // something went wrong with the images in this book
-                $log->logError("bad book $id");
-                wp_update_post(array('ID'=>$id, 'post_status'=>'draft'));
-                $post->post_status = 'draft';
-                break;
-            }
-        }
-        $author = trim(get_post_meta($id, 'author_pseudonym', true));
-        if (!$author) {
-            $authordata = get_userdata($author_id);
-            $author = $authordata->display_name;
-        }
-        $author = preg_replace('/^[bB][yY]:?\s*/', '', $author);
-
-        $tags = array();
-        $language = '??';
-        foreach(wp_get_post_tags($id) as $tag) {
-            $n = $tag->name;
-            if (array_key_exists($n, $LangNameToLangCode)) {
-                $language = $LangNameToLangCode[$n];
-            } else {
-                $tags[] = $n;
-            }
-        }
-        $audience = ' ';
-        $reviewed = false;
-        $type = ' ';
-        $categories = array();
-        foreach(get_the_category($id) as $cat) {
-            if ($cat->cat_ID != 3) {
-                $n = $cat->cat_name;
-                if ($n == 'Reviewed') {
-                    $reviewed = true;
-                } else if ($n == 'Rated E/Everyone') {
-                    $audience = 'E';
-                } else if ($n == 'Rated C/Caution') {
-                    $audience = 'C';
-                } else if ($n == 'Conventional') {
-                    $type = 'C';
-                } else if ($n == 'Transitional') {
-                    $type = 'T';
-                } else if ($n == 'Other') {
-                    $type = 'O';
-                } else {
-                    $categories[] = $CategoryAbbrv[$n];
-                }
-            }
-        }
-        $res = array('title'=>$title,
-                     'author'=>$author,
-                     'type'=>$type,
-                     'audience'=>$audience,
-                     'reviewed'=>$reviewed,
-                     'language'=>$language,
-                     'tags'=>$tags,
-                     'categories'=>$categories,
-                     'pages'=>$pages);
+    $title = trim($post->post_title);
+    $author = trim(get_post_meta($id, 'author_pseudonym', true));
+    if (!$author) {
+        $authordata = get_userdata($author_id);
+        $author = $authordata->display_name;
     }
+    $author = preg_replace('/^[bB][yY]:?\s*/', '', $author);
+    $audience = ' ';
+
+    $audience = ' ';
+    $language = 'en';
+    $categories = array();
+    foreach(get_the_category($id) as $cat) {
+        $n = $cat->cat_name;
+        if ($n == 'Rated E/Everyone') {
+            $audience = 'E';
+        } else if ($n == 'Rated C/Caution') {
+            $audience = 'C';
+        } else {
+            $categories[] = $n;
+        }
+    }
+    $res = array('title'=>$title,
+                 'author'=>$author,
+                 'audience'=>$audience,
+                 'language'=>$language,
+                 'categories'=>$categories);
 
     $res['author_id'] = $author_id;
     $res['status'] = $post->post_status;
 
-    $rating_count = get_post_meta($id, 'book_rating_count', true);
-    if(!$rating_count) {
-        $rating_count = 0;
-    } else {
-        $rating_count = intval($rating_count);
-    }
-    $res['rating_count'] = $rating_count;
-
-    $rating_value = get_post_meta($id, 'book_rating_value', true);
-    if(!$rating_value) {
-        $rating_value = 0;
-    } else {
-        $rating_value = floatval($rating_value);
-    }
-    $res['rating_value'] = round_rating($rating_value);
-    $res['rating_total'] = intval($rating_count * $rating_value);
+    $ytid = $res['ytid'] = get_post_meta($id, 'ytid', true);
+    $res['glink'] = get_post_meta($id, 'link', true);
+    $res['duration'] = get_post_meta($id, 'duration', true);
+    if (!$res['duration']) $res['duration'] = '?';
 
     $res['modified'] = $post->post_modified;
     $res['created'] = $post->post_date;
     $res['slug'] = $post->post_name;
     $res['link'] = preg_replace('/http:\/\/[a-zA-Z0-9.]+/', '', get_permalink($id));
+    $res['preview'] = "http://img.youtube.com/vi/$ytid/hqdefault.jpg";
+    $res['thumbnail'] = "http://img.youtube.com/vi/$ytid/mqdefault.jpg";
     $res['ID'] = $id;
     $res['bust'] = mysql2date('ydmHis', $post->post_modified, false);  // cache bust for speech
 
@@ -421,7 +355,7 @@ function SaveBookPost($id, $book) {
     updateIndex($book);
 
     $post = get_post($id);
-    $book = ParseBookPost($post);
+    $book = ParseGameplayPost($post);
 
     return $book;
 }
@@ -531,42 +465,28 @@ function posts_to_find_results($posts, $nrows, $count) {
         $more = 0;
     }
 
-    $books = array();
+    $gameplays = array();
     for($i=0; $i<$nrows; $i++) {
         $post = $posts[$i];
-        $book = ParseBookPost($post);
-        if (!$book) {
-            $log->logError("bad book in posts_to_find_results " . $post->ID);
-            continue;
-        }
-
+        $g = ParseGameplayPost($post);
         $po = array();
-        $po['title'] = $book['title'];
-        $po['ID'] = $post->ID;
-        $po['slug'] = $book['slug'];
-        $po['link'] = $book['link'];
-        $po['author'] = $book['author'];
-        $po['rating'] = rating_info($book['rating_value']);
-        $po['tags'] = $book['tags'];
-        $po['categories'] = $book['categories'];
-        $po['reviewed'] = $book['reviewed'] == 'R';
-        $po['audience'] = $book['audience'];
-        $po['caution'] = $book['audience'] == 'C';
-        $po['cover'] = $book['pages'][0];
-        $po['preview'] = $book['pages'][1];
-        $po['preview']['text'] = $po['title'];
-        $po['pages'] = count($book['pages']);
-        $po['language'] = $book['language'];
-        $po['bust'] = $book['bust'];
-        $books[] = $po;
+        $po['title'] = $g['title'];
+        $po['ID'] = $g['ID'];
+        $po['slug'] = $g['slug'];
+        $po['author'] = $g['author'];
+        $po['link'] = $g['link'];
+        $po['ytid'] = $g['ytid'];
+        $po['glink'] = $g['glink'];
+        $po['preview'] = $g['preview'];
+        $po['thumbnail'] = $g['thumbnail'];
+        $po['caution'] = $g['audience'] == 'C';
+        $po['duration'] = $g['duration'];
+        $gameplays[] = $po;
     }
 
     $result = array(); // result object
-    $result['books'] = $books;
-    $result['queries2'] = get_num_queries();
-    $result['time'] = timer_stop(0);
+    $result['gameplays'] = $gameplays;
     $result['more'] = $more;
-    $result['reviewer'] = current_user_can('edit_others_posts');
     return $result;
 }
 
@@ -727,8 +647,9 @@ function thr_modify_query( $query ) {
 function thr_get_pagenum_link($link) {
     return str_replace('?ajax=1', '', $link);
 }
-add_filter('get_pagenum_link', thr_get_pagenum_link);
+add_filter('get_pagenum_link', 'thr_get_pagenum_link');
 
+/*
 // disable wordpress search
 function disable_search($query, $error = true) {
     if (is_search()) {
@@ -744,6 +665,7 @@ function disable_search($query, $error = true) {
 if (!is_admin()) {
     add_action('parse_query', 'disable_search');
 }
+*/
 
 function thr_login_redirect($redirect_to, $request, $user) {
     if (strpos($redirect_to, 'wp-admin') !== false) {
@@ -760,4 +682,28 @@ function no_mo_dashboard() {
         exit;
     }
 }
+
+function search_filter($query) {
+  if ( !is_admin() && $query->is_main_query() ) {
+    if ($query->is_search) {
+      $query->set('categories', array( 'gameplays' ) );
+    }
+  }
+}
+add_action('pre_get_posts','search_filter');
+
+//includephp
+function includephp_func( $atts ) {
+    $a = shortcode_atts( array(
+        'name' => '' ), $atts);
+    include $a['name'];
+    return '';
+}
+add_shortcode( 'includephp', 'includephp_func');
+
+//enqueues our external font awesome stylesheet
+function enqueue_our_required_stylesheets(){
+    wp_enqueue_style('font-awesome', 'https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css');
+}
+add_action('wp_enqueue_scripts','enqueue_our_required_stylesheets');
 ?>

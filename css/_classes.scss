@@ -592,6 +592,10 @@
   @include decoratedButton(1px, #61A0B3, 0.5em, 0, $carolinaBlue, #286DA3, 1.1em, 0.1em, 1em, #EEE, #81BEF0, #FFF, 0, 7em);
 }
 
+.thr-blue-button:disabled {
+  opacity: 0.5;
+}
+
 .thr-input {
   @include decoratedInput(1px, #B2B2B2, 0.5em, 0.1em, 1em, 0.15em, 0.3em, #333, $carolinaBlue, rgba(135, 206, 250, 0.4), 0.5em, 0.25s, 1.5em, 16em);
 }

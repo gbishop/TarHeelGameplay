@@ -22,7 +22,7 @@ Templates.%.json: languages/%.po locale/%/LC_MESSAGES/thr.mo templates/*.html se
 build: Templates.en.json Templates.de.json Templates.fr.json Templates.tr.json Templates.es.json Templates.it.json Templates.pt.json Templates.zh.json style.css
 	rm -f manifest.appcache
 
-style.css: tools/MakeMediaQueries.py style.scss css/_allmediaqueries.scss css/_classes.scss css/_collections.scss css/_fileuploader.scss css/_ie.scss css/_image-gallery.scss css/_map-page.scss css/_mixins.scss css/_reset.scss css/_writebooks.scss css/_yourbooks.scss css/_offline.scss
+style.css: tools/MakeMediaQueries.py style.scss css/_allmediaqueries.scss css/_classes.scss css/_collections.scss css/_fileuploader.scss css/_ie.scss css/_image-gallery.scss css/_map-page.scss css/_mixins.scss css/_reset.scss css/_create.scss css/_yourbooks.scss css/_offline.scss
 	python tools/MakeMediaQueries.py > css/_mediaqueries.scss
 	sass --style=compressed style.scss style.css
 
@@ -30,11 +30,11 @@ translate:
 	python tools/BuildTemplate.py --lang=en --extract=languages/thr.pot templates/*.html searchForm.json readingForm.json categories.json languages.json ratings.json locales.json
 
 copygb:
-	rsync -az --exclude .git --exclude tests/robot --delete . gbserver:/var/www/gbserver/wp-content/themes/thr3
+	rsync -az --exclude .git --exclude tests/robot --delete . gbserver2:/var/www/test.tarheelgameplay/wp-content/themes/thg
 	#launch.py http://gbserver3a.cs.unc.edu/
 
 copyproduction:
-	rsync -az --delete ../Theme-build/ gbserver3:/var/www/tarheelreader3/wp-content/themes/thr3
+	rsync -az --delete ../Theme-build/ gbserver2:/var/www/tarheelgameplay/wp-content/themes/thg
 	#launch.py http://tarheelreader.org/
 
 optimized: build
@@ -51,7 +51,7 @@ versioned:
 devel: build copygb
 
 testprod: optimized
-	rsync -az --delete ../Theme-build/ gbserver3:/var/www/test.tarheelreader.org/wp-content/themes/thr3
+	rsync -az --delete ../Theme-build/ gbserver3:/var/www/test.tarheelgameplay/wp-content/themes/thg
 
 production:
 	make optimized

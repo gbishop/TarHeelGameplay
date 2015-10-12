@@ -6,64 +6,32 @@ GET: Return a list of books that match the query
 */
 ?>
 <?php
-// construct the where clause
-$where = array();
-$where[] = "p.post_status = 'publish'";
-foreach(array('language', 'reviewed', 'type', 'audience') as $field) {
-    $value = THR($field);
-    if ($value) {
-        $where[] = "s.$field = '$value'";
-    }
-}
-
-$terms = array();
-
-$query = stripslashes(THR('search'));
-if ($query) {
-    $words = array();
-    $i = preg_match_all('/[\w0-9\'*]+|"[\w0-9\'* ]+"/', $query, $words);
-    foreach($words[0] as $word) {
-        if (strlen($word) < 3) {
-            $esc = esc_sql($word);
-            $where[] = "s.content REGEXP '[[:<:]]" . $esc . "[[:>:]]'";
-        } else {
-            $terms[] = '+' . $word;
-        }
-    }
-}
-
-if (count($terms) > 0) {
-    $qstring = esc_sql(implode(' ', $terms));
-    $where[] = "MATCH(s.content) AGAINST('$qstring' IN BOOLEAN MODE)";
-}
-
-if (THR('category')) {
-    $where[] = "MATCH(s.categories) AGAINST('" . THR('category') . "' IN BOOLEAN MODE)";
-}
-
-if (count($where) > 0) {
-    $where = 'WHERE ' . implode(' AND ', $where);
-} else {
-    $where = '';
-}
-
-$json = array_key_exists('json', $_GET) && $_GET['json'] == 1;
 $count = 24;
-$cp1 = $count + 1; // ask for one more to determine if there are more
-$page = THR('page');
-$offset = ($page - 1) * $count;
-
-$sql = "
-SELECT p.*
-    FROM wpreader_posts p
-    JOIN wpreader_book_search s ON p.ID = s.ID
-    $where
-    ORDER BY p.post_date DESC
-    LIMIT $offset,$cp1";
-$posts = $wpdb->get_results($sql);
-$nrows = min($wpdb->num_rows, count($posts));  // why do I need this?
+$args = array(
+    's'                => THR('search'),
+    'posts_per_page'   => $count,
+    'offset'           => 0,
+    'category'         => '',
+    'category_name'    => 'Gameplays',
+    'orderby'          => 'date',
+    'order'            => 'DESC',
+    'include'          => '',
+    'exclude'          => '',
+    'meta_key'         => '',
+    'meta_value'       => '',
+    'post_type'        => 'post',
+    'post_mime_type'   => '',
+    'post_parent'      => '',
+    'author'       => '',
+    'post_status'      => 'publish'
+);
+$posts = get_posts($args);
+$nrows = count($posts);
+$json = 0;
 
 $result = posts_to_find_results($posts, $nrows, $count);
+
+//print_r($result);
 
 if (0) { // force an error for testing
     header("HTTP/1.0 500 Internal Error");
@@ -82,6 +50,9 @@ if ($json) {
 // construct the searchForm view object
 $searchFormData = $Templates['searchForm'];
 foreach( $searchFormData['controls'] as &$control) {
+    if (!array_key_exists('name', $control)) {
+        continue;
+    }
     if ($control['name'] == 'category') {
         $control['options'] = array_merge($control['options'], $Templates['categories']);
     } elseif ($control['name'] == 'language') {
@@ -96,11 +67,7 @@ setTHR('findAnotherLink', find_url()); // set the return to link to come back to
 <?php
 $view = array();
 $view['searchForm'] = template_render('form', $searchFormData);
-// edit the data to create the view for the template
-foreach( $result['books'] as &$book ) {
-    $c = &$book['cover'];
-    setImageSizes($c);
-}
+
 $view['bookList'] = template_render('bookList', $result);
 
 if ($page > 1) {

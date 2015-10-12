@@ -16,3 +16,5 @@ speech/*.mp3
 languages/thr.pot
 *.swp
 *.pyc
+style.css.map
+

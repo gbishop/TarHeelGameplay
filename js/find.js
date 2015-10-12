@@ -179,8 +179,8 @@ define([ "route",
                 link = selected;
             else
                 link = selected.find('a');
-            //console.log('clicking', link);
-            link.click();
+            console.log('clicking', link);
+            window.open(link.attr('href'), '_blank');
         }
     });
 
@@ -261,8 +261,8 @@ define([ "route",
         return false;
     });
 
-    route.add('render', /^\/find\/(\?.*)?$/, findRender);
-    route.add('render', /^\/favorites\/(\?.*)?$/, findRender);
+    //route.add('render', /^\/find\/(\?.*)?$/, findRender);
+    //route.add('render', /^\/favorites\/(\?.*)?$/, findRender);
     route.add('init', /^\/find\/(\?.*)?$/, findConfigure);
     route.add('init', /^\/favorites\/(\?.*)?$/, findConfigure);
 

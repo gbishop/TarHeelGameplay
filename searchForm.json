@@ -14,14 +14,6 @@
                 { "label": "_(All Topics)", "value": "" }
             ]
         },
-        {   "label": "_(Review status|pulldown label)",
-            "name": "reviewed",
-            "select": true,
-            "options": [
-                { "label": "_(Reviewed only)", "value": "R" },
-                { "label": "_(Include unreviewed)", "value": "" }
-            ]
-        },
         {   "label": "_(Audience|pulldown label for audience ratings)",
             "name": "audience",
             "select": true,

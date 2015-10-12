@@ -19,6 +19,7 @@ define([  "route",
 
     // load a link or submit a form via Ajax so we don't leave the page
     function hijaxLink(event) {
+        console.log('hijaxlink');
         var $this = $(this),
             url,
             context = {}; // passed to the render function as this
@@ -182,10 +183,10 @@ define([  "route",
         });
 
         // hookup links
-        $body.on('click', 'a:not(.no-ajaxy)', hijaxLink);
+        //$body.on('click', 'a:not(.no-ajaxy)', hijaxLink);
 
         // and forms
-        $body.on('submit', 'form:not(.no-ajaxy)', hijaxLink);
+        //$body.on('submit', 'form:not(.no-ajaxy)', hijaxLink);
 
         // hook into state changes
         $(window).on('statechange', stateChange);

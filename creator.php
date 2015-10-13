@@ -1,10 +1,10 @@
 <div id="creator">
 	<ul class="tabs">
-		<li class="tab-link" data-tab="quick">Basic</li>
-		<li class="tab-link current" data-tab="precise">Precise</li>
+		<li class="tab-link current" data-tab="quick">Basic</li>
+		<li class="tab-link" data-tab="precise">Precise</li>
 		<li class="tab-link" data-tab="advanced">Advanced</li>
 	</ul>
-	<div id="quick" class="tab-content">
+	<div id="quick" class="tab-content current">
 		<p>On this tab you can quickly create a basic interactive gameplay with a fixed interval between prompts.</p>
 
 		<form action="/app2/gameplay.html" method="get" target="_blank" id="quick-gameplay">
@@ -39,7 +39,7 @@
 		    </div>
 		</form>
 	</div>
-	<div id="precise" class="tab-content current">
+	<div id="precise" class="tab-content">
 		<p>On this tab you may create a Gameplay where you control the time and text for each prompt.</p>
 		<div class="formlike">
 			<div>

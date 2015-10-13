@@ -29,14 +29,14 @@ if ($collection) {
 } else {
     $favorites = THR('favorites');
 }
-$fav_array = explode($favorites, ',');
+$fav_array = explode(',', $favorites);
 
 $count = 24;
 $cp1 = $count + 1; // ask for one more to determine if there are more
 $page = THR('fpage');
 $offset = ($page - 1) * $count;
 $args = array(
-    'post_in'          => $fav_array,
+    'post__in'          => $fav_array,
     'posts_per_page'   => $cp1,
     'offset'           => $offset,
     'category'         => '',

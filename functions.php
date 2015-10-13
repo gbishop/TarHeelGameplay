@@ -625,10 +625,10 @@ add_filter('register', 'fixupLogInOut');
 
 // fix the email return address
 function thr_mail_from($addr) {
-    return "tarheelreader@cs.unc.edu";
+    return "tarheelgameplay@cs.unc.edu";
 }
 function thr_mail_from_name($name) {
-    return "Tar Heel Reader";
+    return "Tar Heel Gameplay";
 }
 add_filter('wp_mail_from', 'thr_mail_from');
 add_filter('wp_mail_from_name', 'thr_mail_from_name');

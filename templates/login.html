@@ -1,5 +1,5 @@
 {{^logged_in}}
-    <h2>_(Log in to Tar Heel Reader)</h2>
+    <h2>_(Log in to Tar Heel Gameplay)</h2>
     {{#failed}}<p class="message">_(Login Failed)</p>{{/failed}}
     <form class="loginForm" action="/login/" method="post">
         <p>
@@ -27,6 +27,6 @@
     <p><a href="/wp-login.php?action=register" class="thr-blue-button no-ajaxy">_(Register)</a></p>
 {{/logged_in}}
 {{#logged_in}}
-    <h2>_(Log out of Tar Heel Reader)</h2>
+    <h2>_(Log out of Tar Heel Gameplay)</h2>
     <p><a href="{{{logoutURL}}}" class="thr-blue-button no-ajaxy">_(Log out)</a></p>
 {{/logged_in}}

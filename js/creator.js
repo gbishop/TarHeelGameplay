@@ -27,7 +27,7 @@ function saveGameplay(gp) {
             tags: 'error free',
             'custom[ytid]': gp.ytid,
             'custom[link]': gp.link,
-            'custom[duration]': intval((gp.duration+30)/60),
+            'custom[duration]': gp.duration ? Math.round(gp.duration/60) : 0,
             status: 'publish'
         };
     if (gp.slug) {

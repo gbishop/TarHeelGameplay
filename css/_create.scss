@@ -86,15 +86,15 @@ ul.tabs li.current{
             margin-right: 1em;
         }
 
-        i.picon {
+        .picon {
             float: right;
         }
 
-        li:not(:first-child) > i.add-prompt {
+        li:not(:first-child) > .add-prompt {
             display: none;
         }
 
-        li:first-child > i.delete-prompt {
+        li:first-child > .delete-prompt {
             display: none;
         }
 
@@ -122,8 +122,4 @@ ul.tabs li.current{
         }
 
     }
-}
-
-div.video-annotations {
-    display: none;
 }

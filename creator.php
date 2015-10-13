@@ -44,7 +44,7 @@
 		<div class="formlike">
 			<div>
 				<label>YouTube Video ID (or URL)
-					<input type="text" name="video" value="https://www.youtube.com/watch?v=ia8bhFoqkVE" />
+					<input type="text" name="video" value="" />
 				</label>
 				<button class="loadVideo" disabled>Load</button>
 			</div>
@@ -54,7 +54,6 @@
 		        <ul class="timepoints">
                 <script id="timepoint" type="text/html">
                 	<li class="tp-{{type}}">
-                		<i class="picon delete-pause fa fa-trash-o" title="delete pause"></i>
                 		<div>
                 		    <label>{{timeLabel}}:
                 		    	<input type="number" name="time" value="{{time}}" step="0.1"
@@ -68,6 +67,9 @@
                 		    		placeholder="Enter message" />
                 		    </label>
                 		</div>
+                		<button class="delete-pause picon" title="delete pause">
+                			<i class="fa fa-trash-o" ></i>
+                		</button>
                 		{{/single}}
                 		{{#multiple}}
                 		<ol>

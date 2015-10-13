@@ -31,7 +31,9 @@ translate:
 
 copygb:
 	rsync -az --exclude .git --exclude tests/robot --delete . gbserver2:/var/www/test.tarheelgameplay/wp-content/themes/thg
-	#launch.py http://gbserver3a.cs.unc.edu/
+
+copyproto:
+	rsync -az --exclude .git --exclude tests/robot --delete . gbserver2:/var/www/tarheelgameplay/wp-content/themes/thg
 
 copyproduction:
 	rsync -az --delete ../Theme-build/ gbserver2:/var/www/tarheelgameplay/wp-content/themes/thg
@@ -50,8 +52,10 @@ versioned:
 
 devel: build copygb
 
+prototype: build copyproto
+
 testprod: optimized
-	rsync -az --delete ../Theme-build/ gbserver3:/var/www/test.tarheelgameplay/wp-content/themes/thg
+	rsync -az --delete ../Theme-build/ gbserver2:/var/www/test.tarheelgameplay/wp-content/themes/thg
 
 production:
 	make optimized

@@ -40,8 +40,8 @@
         <script src="/theme/js/json2.min.js"></script>
         <script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
         <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js"></script>
-        <script src="/app2/urlon.js"></script>
-        <script src="/app2/ICanHaz.js"></script>
+        <script src="/theme/js/urlon.js"></script>
+        <script src="/theme/js/ICanHaz.js"></script>
 
         <script>
             var require = { waitSeconds: 200 };

@@ -332,12 +332,33 @@ $(function() {
         }
 
     }).on('focus', "input[type='number']", function(evt) {
-        console.log('focus in', evt);
         var $target = $(evt.target),
             value = parseFloat($target.val());
         if (player) player.seekTo(value);
+        fixChromeScrollBug($target);
         return true;
     });
+
+    // jump to the button and back to fix a Chrome scroll bug
+    function fixChromeScrollBug($target) {
+        function makeVisible($i, $c) {
+          var ct = $c.offset().top,
+              ch = $c.height(),
+              it = $i.offset().top,
+              ih = $i.outerHeight(),
+              vis = it>=ct && it+ih<=ct+ch;
+          if (!vis) {
+            if (it < ct) {
+              $c.scrollTop($c.scrollTop() + it - ct);
+            } else {
+              $c.scrollTop($c.scrollTop() + it+ih - ct-ch);
+            }
+          }
+          return vis;
+        }
+        makeVisible($target.closest('li'), $target.closest('ul'));
+        console.log('fixed');
+    }
 
     $a.find('.timepoints').on('click', 'i.delete-pause', function(e) {
         $(this).parent().remove();

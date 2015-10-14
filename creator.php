@@ -42,31 +42,25 @@
 	<div id="precise" class="tab-content">
 		<p>On this tab you may create a Gameplay where you control the time and text for each prompt.</p>
 		<div class="formlike">
-			<div>
-				<label>YouTube Video ID (or URL)
-					<input type="text" name="video" value="" />
-				</label>
-				<button class="loadVideo" disabled>Load</button>
-			</div>
+			<label>YouTube Video ID (or URL)
+				<input type="text" name="video" value="" />
+			</label>
+			<button class="loadVideo" disabled>Load</button>
 		    <div class="player-container">
 		        <div class="player"></div>
 				<button class="add-pause thr-blue-button">Add A Pause</button>
 		        <ul class="timepoints">
                 <script id="timepoint" type="text/html">
                 	<li class="tp-{{type}}">
-                		<div>
-                		    <label>{{timeLabel}}:
-                		    	<input type="number" name="time" value="{{time}}" step="0.1"
-                		    		placeholder="Enter time" title="Use up and down arrow to adjust the time. Use shift for bigger steps." />
-                		    </label>
-                		</div>
+            		    <label>{{timeLabel}}:
+            		    	<input type="number" name="time" value="{{time}}" step="0.1"
+            		    		placeholder="Enter time" title="Use up and down arrow to adjust the time. Use shift for bigger steps." />
+            		    </label>
                 		{{#single}}
-                		<div>
-                		    <label>Prompt:
-                		    	<input type="text" name="message" value="{{message}}"
-                		    		placeholder="Enter message" />
-                		    </label>
-                		</div>
+            		    <label>Prompt:
+            		    	<input type="text" name="message" value="{{message}}"
+            		    		placeholder="Enter message" />
+            		    </label>
                 		<button class="delete-pause picon" title="delete pause">
                 			<i class="fa fa-trash-o" ></i>
                 		</button>

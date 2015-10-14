@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Tar Heel Gameplay Creator</title>
+    <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+    <script src="https://www.youtube.com/iframe_api"></script>
+    <script src="ICanHaz.js"></script>
+    <script src="urlon.js"></script>
+    <script src="code.js"></script>
+    <link href="style.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+</head>
+<body>
+    <h1>Tar Heel Gameplay Creator</h1>
+    <label for="video">YouTube Video ID or URL</label>
+    <input type="text" id="video" value="https://www.youtube.com/watch?v=ia8bhFoqkVE" />
+    <button id="loadVideo" disabled>Load</button>
+    <div id="controls">
+        <div id="left-panel">
+        <table id="timepoints-table">
+            <caption>Stop List</caption>
+            <thead>
+                <tr><th>Time</th><th>Prompt</th></tr>
+            </thead>
+            <tbody id="timepoints">
+                <script id="timepoint" type="text/html">
+                    <tr><td class="t">{{time}}</td><td class="l">{{label}}</td></tr>
+                </script>
+            </tbody>
+        </table>
+        <button id="play" disabled>Run Gameplay!</button>
+        </div>
+        <div id="player-container">
+            <div id="player"></div>
+            <div id="player-controls">
+                <button data-step="-10">-10</button>
+                <button data-step="-1">-1</button>
+                <button data-step="-0.1">-0.1</button>
+                <button data-step="+0.1">0.1</button>
+                <button data-step="+1">+1</button>
+                <button data-step="+10">+10</button>
+            </div>
+            <div id="tp-editor">
+                <i class="fa fa-info-circle" title="click for help"></i>
+                <div class="help">
+                    <p>Set the time for a stop point by dragging the video slider, or using the buttons below the video to advance time in steps of 0.1, 1, or 10 seconds. When you have the time you want, enter text for the Prompt and click Add.</p>
+                    <p>You can update an existing stop point by clicking on it in the list to the left of the video, modifying the Time (as above) or Prompt and clicking Update.
+                    </p>
+                </div>
+                <div>
+                    <label for="current-time">Time:</label>
+                    <input type="number" id="current-time" readonly />
+                </div>
+                <div>
+                    <label for="message">Prompt:</label>
+                    <input type="text" id="message" />
+                </div>
+                <button id="add">Add</button>
+                <button id="update" disabled>Update</button>
+                <button id="delete" disabled>Delete</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

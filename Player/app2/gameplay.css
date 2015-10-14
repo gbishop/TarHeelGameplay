@@ -34,3 +34,7 @@ body {
 #message .selected td {
   border-color: black;
 }
+
+#message td:hover {
+  border-color: black;
+}

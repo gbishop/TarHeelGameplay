@@ -3,14 +3,12 @@ define([
     "state",
     "controller",
     "find",
-    "read",
-    "write",
+    "creator",
     "busy",
     "navigation",
     "help",
-    "yourbooks",
-    "offline",
-    "home"],
+    "yourbooks"
+    ],
     function(route, state, controller) {
         $(function() {
             var url = window.location.href,

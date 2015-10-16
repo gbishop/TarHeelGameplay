@@ -1,0 +1,43 @@
+                    <li class="tp-{{type}}">
+                        <label>{{timeLabel}}:
+                            <input type="number" name="time" value="{{time}}" step="0.1"
+                                placeholder="Enter time" title="Use up and down arrow to adjust the time. Use shift for bigger steps." />
+                        </label>
+                        {{#single}}
+                        <label>Prompt:
+                            <input type="text" name="message" value="{{message}}"
+                                placeholder="Enter message" />
+                        </label>
+                        <button class="delete-pause picon" title="delete pause">
+                            <i class="fa fa-trash-o" ></i>
+                        </button>
+                        {{/single}}
+                        {{#multiple}}
+                        <ol>
+                            {{#prompts}}
+                            <li>
+                                <i class="picon delete-prompt fa fa-trash-o" title="delete prompt"></i>
+                                <div>
+                                    <label>Choice:
+                                        <input type="text" name="message" value="{{message}}"
+                                            placeholder="Enter message" />
+                                    </label>
+                                </div>
+                                <div>
+                                    <label>Action:
+                                        <input type="radio" name="action" value="continue"
+                                            {{^target}}checked{{/target}}
+                                            title="Continue playing the video"/>Continue
+                                        <input type="radio" name="action" value="jump"
+                                            {{#target}}checked{{/target}}
+                                            title="Jump to a new time in the video"/>Jump to:
+                                        <input type="number" name="target" value="{{target}}"
+                                            placeholder="Enter a time" />
+                                    </label>
+                                </div>
+                            </li>
+                            {{/prompts}}
+                            <button class="add-choice thr-blue-button">Add A Choice</button>
+                        </ol>
+                        {{/multiple}}
+                    </li>

@@ -1,4 +1,4 @@
-define(['templates', 'route', 'state'], function(templates, route, state) {
+define(['templates', 'route', 'state', 'urlon'], function(templates, route, state, urlon) {
 
     window.onYouTubeIframeAPIReady = function() {
         $(function() {
@@ -244,7 +244,7 @@ define(['templates', 'route', 'state'], function(templates, route, state) {
                 m: messages,
                 v: videoId
             };
-            var url = '/app2/gameplay.html?' + URLON.stringify(res);
+            var url = '/app2/gameplay.html?' + urlon.stringify(res);
             return url;
         }
 

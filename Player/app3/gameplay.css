@@ -5,8 +5,8 @@ body {
 
 #shade {
   position: absolute;
-  top: 8px;
-  left: 8px;
+  top: 0px;
+  left: 0px;
   display: none;
   background: rgba(0,0,0,0.7);
   color: white;

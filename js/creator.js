@@ -118,8 +118,11 @@ define(['templates', 'route', 'state', 'urlon'], function(templates, route, stat
             return v;
         }
 
+        var pauseOnPlay = true;
         function loadVideo() {
             videoId = fixupVideoId();
+            console.log('videoId=', videoId);
+            $a.find('.player').replaceWith('<div class="player"></div>');
             player = new YT.Player($a.find('.player').get(0), {
                 //height: "30em",
                 //width: "40em",
@@ -128,14 +131,14 @@ define(['templates', 'route', 'state', 'urlon'], function(templates, route, stat
                     iv_load_policy: 3
                 },
                 events: {
-                    'onReady': function() {
-                        //player.seekTo(0.0, true);
-                        //player.pauseVideo();
+                    onReady: function() {
+                        pauseOnPlay = true;
                         initTimepoints();
                     },
-                    'onStateChange': onPlayerStateChange
+                    onStateChange: onPlayerStateChange
                 }
             });
+            console.log('player', player);
         }
 
         function createTimepoint(time, type, prompt, $item) {
@@ -155,7 +158,6 @@ define(['templates', 'route', 'state', 'urlon'], function(templates, route, stat
             return $item;
         }
 
-        var pauseOnPlay = true;
         var duration = 0;
         function initTimepoints() {
             duration = player.getDuration();
@@ -178,7 +180,6 @@ define(['templates', 'route', 'state', 'urlon'], function(templates, route, stat
             player.pauseVideo();
         }
 
-
         function onPlayerStateChange(event) {
             if (pauseOnPlay && event.data == YT.PlayerState.PLAYING) {
                 player.pauseVideo();
@@ -196,7 +197,7 @@ define(['templates', 'route', 'state', 'urlon'], function(templates, route, stat
             $tp.parent().scrollTop($tp.offset().top);
         }
         function addTimepoint() {
-            var t = player.getCurrentTime();
+            var t = player && player.getCurrentTime() || 0;
             var $tp = createTimepoint(t, 'single', '');
             insertTimepoint($tp);
             scrollIntoView($tp);
@@ -211,8 +212,7 @@ define(['templates', 'route', 'state', 'urlon'], function(templates, route, stat
         }
 
         function getPlayLink() {
-            var tps = [],
-                mis = [],
+            var tps = {},
                 messages = [];
             function getMessageIndex(s) {
                 var mi = messages.indexOf(s);
@@ -222,29 +222,24 @@ define(['templates', 'route', 'state', 'urlon'], function(templates, route, stat
                 }
                 return mi;
             }
-            // sort the timepoints
-            var $tps = $a.find(".timepoints");
-            $tps.children().detach().sort(function(a, b) {
-                var ta = parseFloat($(a).find('input[name=time]').val()),
-                    tb = parseFloat($(b).find('input[name=time]').val());
-                return ta==tb ? 0 : (ta > tb) ? 1 : -1;
-            }).appendTo($tps);
-            $tps.children().each(function() {
+            // get the start time
+            var start = parseFloat($a.find(".tp-start input[name=time]").val());
+            // get the rest of the timepoints
+            $a.find(".timepoints li").not('.tp-start').each(function() {
                 var $this = $(this),
                     time = parseFloat($this.find('input[name=time]').val()),
                     message = $this.find('input[name=message]').val();
                 if (!message) message = "";
-                // get message index
-                mis.push(getMessageIndex(message));
-                tps.push(time);
+                tps[time] = getMessageIndex(message);
             });
             var res = {
+                s: start,
                 t: tps,
-                i: mis,
                 m: messages,
                 v: videoId
             };
-            var url = '/app2/gameplay.html?' + urlon.stringify(res);
+            console.log('res', res);
+            var url = '/app3/gameplay.html?' + urlon.stringify(res);
             return url;
         }
 

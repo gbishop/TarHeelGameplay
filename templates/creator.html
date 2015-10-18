@@ -59,7 +59,23 @@
 
     </div>
     <div id="advanced" class="tab-content">
-        <p>The advanced creator will eventually appear here</p>
+        <p>On this tab you may create a Gameplay multiple prompts at each time.</p>
+        <div class="formlike">
+            <label>YouTube Video ID (or URL)
+                <input type="text" name="video" value="" />
+            </label>
+            <button class="loadVideo" disabled>Load</button>
+            <div class="player-container">
+                <div class="player"></div>
+                <button class="add-pause thr-blue-button">Add A Pause</button>
+                <ul class="timepoints">
+                </ul>
+
+            </div>
+            <button class="play thr-blue-button">Play</button>
+
+        </div>
+
     </div>
 
     {{#loggedin}}

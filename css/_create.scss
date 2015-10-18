@@ -81,6 +81,10 @@ ul.tabs li.current{
             width: 5em;
         }
 
+        input[name=target] {
+            display: none;
+        }
+
         label {
             /*display: inline-block;*/
             margin-right: 1em;
@@ -94,7 +98,7 @@ ul.tabs li.current{
             display: none;
         }
 
-        li:first-child > .delete-prompt {
+        li:first-child > .delete-choice {
             display: none;
         }
 
@@ -106,6 +110,21 @@ ul.tabs li.current{
             display: inline-block;
         }
 
+        .tp-multiple li {
+            position: relative;
+        }
+
+        .tp-multiple button.add-choice {
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            display: none;
+        }
+
+        .tp-multiple li:last-child button.add-choice {
+            display: block;
+        }
+
         .tp-start .delete-pause, .tp-start .add-choice {
             display: none;
         }
@@ -115,8 +134,8 @@ ul.tabs li.current{
         }
 
         .player {
-            width: 30em;
-            min-height: 24em;
+            width: 20em;
+            min-height: 16em;
             background: black;
             margin-bottom: 0.5em;
         }

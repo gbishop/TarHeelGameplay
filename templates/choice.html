@@ -1,0 +1,22 @@
+<li>
+    <button class="picon delete-choice" title="delete choice">
+        <i class="fa fa-trash-o"></i>
+    </button>
+    <label>Choice:
+        <input type="text" name="message" value="{{message}}"
+            placeholder="Enter message" />
+    </label>
+    <label>Action:
+        <select name="action">
+            <option value="0" selected>Continue</option>
+            <option value="-1">Start over</option>
+            <option value="-2">Quit</option>
+            <option value="jump">Jump to:</option>
+        </select>
+        <input type="number" name="target" value="{{target}}"
+            placeholder="Time" />
+    </label>
+    <button class="add-choice picon" title="add choice">
+        <i class="fa fa-plus-square"></i>
+    </button>
+</li>

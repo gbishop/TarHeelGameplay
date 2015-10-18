@@ -101,8 +101,9 @@ define(['templates', 'route', 'state', 'urlon'], function(templates, route, stat
         });
     }
 
-    function preciseInit() {
-        var $a = $('#precise');
+    function tabInit(tab) {
+        var $a = $('#' + tab);
+        console.log($a.get(0));
 
         var player;
 
@@ -133,6 +134,7 @@ define(['templates', 'route', 'state', 'urlon'], function(templates, route, stat
                 events: {
                     onReady: function() {
                         pauseOnPlay = true;
+                        player.playVideo();
                         initTimepoints();
                     },
                     onStateChange: onPlayerStateChange
@@ -141,7 +143,7 @@ define(['templates', 'route', 'state', 'urlon'], function(templates, route, stat
             console.log('player', player);
         }
 
-        function createTimepoint(time, type, prompt, $item) {
+        function createTimepoint(time, type, prompt) {
             var v = {
                 type: type,
                 time: time.toFixedDown(1),
@@ -151,7 +153,7 @@ define(['templates', 'route', 'state', 'urlon'], function(templates, route, stat
                 v.message = prompt;
                 v.single = true;
             } else if (type == 'multiple') {
-                v.prompts = prompt;
+                v.prompts = templates.render('choice', { message: prompt });
                 v.multiple = true;
             }
             $item = $(templates.render('timepoint', v));
@@ -164,20 +166,11 @@ define(['templates', 'route', 'state', 'urlon'], function(templates, route, stat
             var $tp = $a.find('.timepoints');
             $tp.find('li:gt(0)').remove();
             $a.find('.play').attr('disabled', false);
-            player.playVideo();
         }
 
         function insertTimepoint($tp) {
             $a.find('.timepoints').append($tp);
             return $tp;
-        }
-
-        function stepVideo(amt) {
-            player.pauseVideo();
-            var t = player.getCurrentTime();
-            t += amt;
-            player.seekTo(t, true);
-            player.pauseVideo();
         }
 
         function onPlayerStateChange(event) {
@@ -196,9 +189,11 @@ define(['templates', 'route', 'state', 'urlon'], function(templates, route, stat
         function scrollIntoView($tp) {
             $tp.parent().scrollTop($tp.offset().top);
         }
+
         function addTimepoint() {
             var t = player && player.getCurrentTime() || 0;
-            var $tp = createTimepoint(t, 'single', '');
+            var $tp = tab == 'precise' ? createTimepoint(t, 'single', '') :
+                createTimepoint(t, 'multiple', '');
             insertTimepoint($tp);
             scrollIntoView($tp);
         }
@@ -225,13 +220,30 @@ define(['templates', 'route', 'state', 'urlon'], function(templates, route, stat
             // get the start time
             var start = parseFloat($a.find(".tp-start input[name=time]").val());
             // get the rest of the timepoints
-            $a.find(".timepoints li").not('.tp-start').each(function() {
-                var $this = $(this),
-                    time = parseFloat($this.find('input[name=time]').val()),
-                    message = $this.find('input[name=message]').val();
-                if (!message) message = "";
-                tps[time] = getMessageIndex(message);
-            });
+            if (tab == 'precise') {
+                $a.find(".timepoints li").not('.tp-start').each(function() {
+                    var $this = $(this),
+                        time = parseFloat($this.find('input[name=time]').val()),
+                        message = $this.find('input[name=message]').val();
+                    if (!message) message = "";
+                    tps[time] = getMessageIndex(message);
+                });
+            } else {
+                $a.find(".timepoints > li").not('.tp-start').each(function() {
+                    var $this = $(this),
+                        time = parseFloat($this.find('input[name=time]').val()),
+                        choices = {};
+                    $this.find('ol li').each(function() {
+                        var $li = $(this),
+                            prompt = $li.find('input[name=message]').val() || 'undef',
+                            pi = getMessageIndex(prompt),
+                            action = $li.find('select').val(),
+                            target = parseFloat($li.find('input[name=target]').val());
+                        choices[pi] = action == 'jump' ? target : parseInt(action);
+                    });
+                    tps[time] = choices;
+                });
+            }
             var res = {
                 s: start,
                 t: tps,
@@ -276,11 +288,14 @@ define(['templates', 'route', 'state', 'urlon'], function(templates, route, stat
         });
 
         $(document).on('apiReady', function() {
-            $a.find('.loadVideo').prop('disabled', false);
+            console.log('apiReady', $a.find('.loadVideo').get(0));
+            $(function() {
+                $a.find('.loadVideo').prop('disabled', false);
+            });
         });
 
         // allow jogging the video from the various time inputs
-        $('#creator').on('keydown', "input[type='number']", function(evt) {
+        $a.on('keydown', "input[type='number']", function(evt) {
             if (evt.keyCode == 38 || evt.keyCode == 40) { // up or down arrow
                 evt.preventDefault();
                 var $target = $(evt.target),
@@ -304,8 +319,22 @@ define(['templates', 'route', 'state', 'urlon'], function(templates, route, stat
             return true;
         });
 
-        $a.find('.timepoints').on('click', 'i.delete-pause', function(e) {
-            $(this).parent().remove();
+        $a.find('.timepoints')
+        .on('click', 'button.delete-pause', function(e) {
+            $(e.currentTarget).closest('li').remove();
+        })
+        .on('click', 'button.delete-choice', function(e) {
+            $(e.currentTarget).closest('li').remove();
+        })
+        .on('click', 'button.add-choice', function(e) {
+            var n = templates.render('choice', { message: '' });
+            $(e.currentTarget).closest('ol').append(n);
+        })
+        .on('change', 'select[name=action]', function(e) {
+            var $s = $(e.target),
+                sv = $s.find(":selected").val();
+            console.log('sc', $s, sv);
+            $s.siblings('input[name=target]').toggle(sv == 'jump');
         });
 
         $a.find('.loadVideo').on('click', loadVideo);
@@ -341,7 +370,8 @@ define(['templates', 'route', 'state', 'urlon'], function(templates, route, stat
     function creatorInit() {
         tabsInit();
         basicInit();
-        preciseInit();
+        tabInit('precise');
+        tabInit('advanced');
         saveInit();
         $.getScript('https://www.youtube.com/iframe_api');
     }

@@ -194,8 +194,9 @@ function shuffle(array) {
 }
 
 // display choices
-function showPrompt() {
-    var choices = nextTimePoint.choices,
+function showPrompt(tp) {
+    if (!tp) tp = nextTimePoint;
+    var choices = tp.choices,
         $message = $('#message').empty();
     shuffle(choices);
     for (var i=0; i < choices.length; i++) {
@@ -227,6 +228,10 @@ function doResponse($tr) {
     }
     $('#shade').hide();
     var next = $tr.data('next');
+    if (next == -3) {
+        showPrompt();
+        return;
+    }
     if (next) {
         goToTime(next);
         return;
@@ -362,6 +367,7 @@ $(document).on('click touchstart', '#shade', function(evt) {
 var movers = [39, 32],   // right arrow, space
     choosers = [37, 13]; // left arrow, enter
 var down = {};
+var cycleCount = 0; // escape after 3 cycles through the choices
 $(document).on('keydown', function(evt) {
     evt.preventDefault();
     if (down[evt.keyCode]) return; // prevent key repeat
@@ -370,16 +376,32 @@ $(document).on('keydown', function(evt) {
     //console.log('kd', evt);
     var $choices = $('#message tr'),
         $selected = $choices.filter('.selected');
-    if($choices.length == 1) {
-        // any key for one choice
-        doResponse($choices.eq(0));
-
-    } else if (movers.indexOf(evt.keyCode) >= 0) {
+    if (evt.keyCode == 27) { // escape key to quit
+        window.close();
+        return;
+    }
+    if (movers.indexOf(evt.keyCode) >= 0) {
         // mover
         var n = 0;
         if($selected.length > 0) {
             n = ($choices.index($selected) + 1) % $choices.length;
             $selected.removeClass('selected');
+        }
+        // count the number of times cycling through the choices
+        // after 3 cycles, offer to quit
+        if (n == 0) cycleCount += 1;
+        if (cycleCount >= 3) {
+            showPrompt({
+                choices: [
+                    { prompt: 'Quit',
+                      next: -2 // quit
+                    },
+                    { prompt: 'Continue',
+                      next: -3 // reprompt
+                    }
+                ]});
+            cycleCount = 0;
+            return;
         }
         $selected = $choices.eq(n);
         $selected.addClass('selected');
@@ -390,6 +412,11 @@ $(document).on('keydown', function(evt) {
         if ($selected.length > 0) {
             doResponse($selected);
         }
+        cycleCount = 0;
+
+    } else if ($choices.length == 1) { // allow any key if only one choice
+        cycleCount = 0;
+        doResponse($selected);
     }
 });
 $(document).on('keyup', function(evt) {

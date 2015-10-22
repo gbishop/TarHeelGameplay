@@ -6,12 +6,12 @@ $search_table = $wpdb->prefix . 'book_search';
 // setup logging
 date_default_timezone_set('EST');
 require('KLogger.php');
-$log = new KLogger('/var/tmp/tarheelreader', KLogger::WARN);
+$log = new KLogger('/var/tmp/tarheelgameplay', KLogger::WARN);
 
 require('state.php'); // manage shared state in a cookie so both client and host have access
 
 if (THR('debug') == 1) {
-    $log = new KLogger('/var/tmp/tarheelreader', KLogger::DEBUG);
+    $log = new KLogger('/var/tmp/tarheelgameplay', KLogger::DEBUG);
 }
 
 $locale = THR('locale');
@@ -274,7 +274,10 @@ function striptrim_deep($value)
 }
 
 function ParseGameplayPost($post) {
+    global $log;
     if (!$post || !$post->ID || !in_category('gameplays', $post)) {
+        $log->logError('bad post');
+        $log->logError(print_r($post, true));
         return false;
     }
 
@@ -291,24 +294,15 @@ function ParseGameplayPost($post) {
     $author = preg_replace('/^[bB][yY]:?\s*/', '', $author);
     $audience = ' ';
 
-    $audience = ' ';
-    $language = 'en';
-    $categories = array();
-    foreach(get_the_category($id) as $cat) {
-        $n = $cat->cat_name;
-        if ($n == 'Rated E/Everyone') {
-            $audience = 'E';
-        } else if ($n == 'Rated C/Caution') {
-            $audience = 'C';
-        } else {
-            $categories[] = $n;
-        }
-    }
+    $tags = [];
+    $posttags = get_the_tags($id);
+    if ($posttags)
+        foreach($posttags as $tag)
+            $tags[] = $tag->name;
+
     $res = array('title'=>$title,
                  'author'=>$author,
-                 'audience'=>$audience,
-                 'language'=>$language,
-                 'categories'=>$categories);
+                 'tags'=>$tags);
 
     $res['author_id'] = $author_id;
     $res['status'] = $post->post_status;
@@ -317,6 +311,10 @@ function ParseGameplayPost($post) {
     $res['glink'] = get_post_meta($id, 'link', true);
     $res['duration'] = get_post_meta($id, 'duration', true);
     if (!$res['duration']) $res['duration'] = '?';
+    $res['language'] = get_post_meta($id, 'language', true);
+    if (!$res['language']) $res['language'] = 'en';
+    $res['audience'] = get_post_meta($id, 'audience', true);
+    if (!$res['audience']) $res['audience'] = 'E';
 
     $res['modified'] = $post->post_modified;
     $res['created'] = $post->post_date;
@@ -330,17 +328,18 @@ function ParseGameplayPost($post) {
     return $res;
 }
 
-function SaveBookPost($id, $book) {
+function SaveGameplayPost($id, $book) {
     global $log;
+    $gpcat = get_category_by_slug('gameplays');
     $args = array('post_title' => $book['title'],
                   'post_status' => $book['status'],
-                  'post_excerpt' => 'A new book at Tar Heel Reader',
-                  'post_category' => array(3));
+                  'post_content' => $book['vocabulary'],
+                  'post_category' => array($gpcat->term_id),
+                  'tags_input' => $book['tags']);
     if($id) {
         $args['ID'] = $id;  // force update instead of insert
         $id = wp_update_post($args, true);
     } else {
-        $args['post_content'] = 'Content is json';
         $id = wp_insert_post($args, true);
     }
 
@@ -352,9 +351,16 @@ function SaveBookPost($id, $book) {
     }
     $book['ID'] = $id;
 
-    updateIndex($book);
+    update_post_meta($id, 'ytid', $book['ytid']);
+    update_post_meta($id, 'link', $book['glink']);
+    update_post_meta($id, 'duration', $book['duration']);
+    update_post_meta($id, 'author_pseudonym', $book['author']);
+    update_post_meta($id, 'language', $book['language']);
+    update_post_meta($id, 'audience', $book['audience']);
 
+    $log->logError(print_r($id, true));
     $post = get_post($id);
+    $log->logError(print_r($post, true));
     $book = ParseGameplayPost($post);
 
     return $book;
@@ -606,6 +612,11 @@ function removeHeadLinks() {
     // Hide the version of WordPress you're running from source and RSS feed // Want to JUST remove it from the source? Try:
     remove_action('wp_head', 'wp_generator');
 
+    // remove emoji crap
+    remove_action( 'wp_head', 'print_emoji_detection_script', 7 );
+    remove_action( 'admin_print_scripts', 'print_emoji_detection_script' );
+    remove_action( 'wp_print_styles', 'print_emoji_styles' );
+    remove_action( 'admin_print_styles', 'print_emoji_styles' );
 }
 add_action('init', 'removeHeadLinks');
 add_filter( 'show_admin_bar', '__return_false' ); // disable the wordpress bar
@@ -704,6 +715,7 @@ add_shortcode( 'includephp', 'includephp_func');
 //enqueues our external font awesome stylesheet
 function enqueue_our_required_stylesheets(){
     wp_enqueue_style('font-awesome', 'https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css');
+    wp_enqueue_style('open-sans', 'http://fonts.googleapis.com/css?family=Open+Sans');
 }
 add_action('wp_enqueue_scripts','enqueue_our_required_stylesheets');
 ?>

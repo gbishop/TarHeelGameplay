@@ -1,8 +1,6 @@
 {
-    "reviewed": { "pattern": "^R?$", "default": "R" },
     "language": { "pattern": "^([a-z]{2,3})?$", "default": "en" },
-    "page": { "pattern": "^\\d+$", "default": "1" },
-    "category": { "pattern": "^([A-Za-z]{4})?$", "default": "" },
+    "category": { "pattern": "^([-A-Za-z]+)?$", "default": "" },
     "type": { "pattern": "^[TCO]?$", "default": "" },
     "audience": { "pattern": "^[CE]?$", "default": "E" },
     "search": { "pattern": "", "default": "" },
@@ -12,10 +10,7 @@
     "locale": { "pattern": "^[a-z]{2,3}$", "default": "en" },
     "favorites": { "pattern": "(^[AR]?\\d+(,+\\d+)*$)|(^$)", "default": "" },
     "fpage": { "pattern": "^\\d+$", "default": "1" },
-    "collection": { "pattern": "^[-\\w\\d]*$", "default": "" },
+    "page": { "pattern": "^\\d+$", "default": "1" },
     "findAnotherLink": { "pattern": "", "default": "/find/" },
-    "classic": { "pattern": "^[01]$", "default": "0" },
-    "debug": { "pattern": "^[01]$", "default": "0" },
-    "offline" : { "pattern": "^[01]$", "default": "0" },
-    "eyetracker": { "pattern": "^[01]$", "default": "0"}
+    "debug": { "pattern": "^[01]$", "default": "0" }
 }

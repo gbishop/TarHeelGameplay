@@ -4,6 +4,7 @@ define([
     "controller",
     "find",
     "creator",
+    "gameplay",
     "busy",
     "navigation",
     "help",

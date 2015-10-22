@@ -1,10 +1,5 @@
-define(['templates', 'route', 'state', 'urlon'], function(templates, route, state, urlon) {
-
-    window.onYouTubeIframeAPIReady = function() {
-        $(function() {
-            $(document).trigger('apiReady');
-        });
-    }
+require(['templates', 'route', 'state', 'youtube', 'urlon'],
+    function(templates, route, state, youtube, urlon) {
 
     function ytVideoId(id_or_url) {
         var regExp = /^.*(youtube\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
@@ -25,34 +20,24 @@ define(['templates', 'route', 'state', 'urlon'], function(templates, route, stat
         $messages.empty();
 
         // validate title
-        var method = 'create_post',
-            args = {
-                title: gp.title,
-                content: gp.vocabulary,
-                categories: 'Gameplays',
-                tags: 'error free',
-                'custom[ytid]': gp.ytid,
-                'custom[link]': gp.link,
-                'custom[duration]': gp.duration ? Math.round(gp.duration/60) : 0,
-                status: 'publish'
-            };
-        if (gp.slug) {
-            args.slug = gp.slug;
-            method = 'update_post';
+        var topic = $('select[name=topic]').val();
+        if (topic) {
+            gp.tags.push(topic);
         }
-        // get the nonce
-        $.get('/api/get_nonce/', {
-                controller: 'posts',
-                method: method })
-        .done(function(res) {
-            args.nonce = res.nonce;
-            // create the new post
-            $.post('/api/posts/' + method + '/', args)
-            .done(function(r) {
-                $messages.append(slug ? 'Gameplay updated' : 'Gameplay saved');
-            }).error(function(e) {
-                $errors.append('Save failed');
-            });
+        gp.audience = $('select[name=audience]').val();
+        gp.author = $('input[name=author]').val();
+        gp.title = $('input[name=title]').val();
+        gp.language = $('select[name=language]').val();
+        var args = {
+            gameplay: JSON.stringify(gp),
+            publish: true
+        };
+        $.post('/gameplay-as-json/', args)
+        .done(function(ngp) {
+            $messages.append(gp.slug ? 'Gameplay updated' : 'Gameplay saved')
+        })
+        .error(function(e) {
+            $errors.append('Save failed');
         });
     }
 
@@ -62,11 +47,11 @@ define(['templates', 'route', 'state', 'urlon'], function(templates, route, stat
             // validate all of these
             var $form = $q.find('#quick-gameplay'),
                 g = {
-                    title: $("input[name='title']").val(),
-                    rating: $("select[name='rating']").val(),
                     ytid: $q.find("input[name='video']").val(),
                     vocabulary: $q.find("input[name='message']").val(),
-                    link: $form.attr('action') + '?' + $form.serialize()
+                    link: '/play/'+ '?' + $form.serialize(),
+                    tags: ['basic', 'error-free'],
+                    duration: 0 // BUG
                 };
             return g;
         }
@@ -124,38 +109,31 @@ define(['templates', 'route', 'state', 'urlon'], function(templates, route, stat
             videoId = fixupVideoId();
             console.log('videoId=', videoId);
             $a.find('.player').replaceWith('<div class="player"></div>');
-            player = new YT.Player($a.find('.player').get(0), {
-                //height: "30em",
-                //width: "40em",
-                videoId: videoId,
-                playerVars: {
-                    iv_load_policy: 3
-                },
-                events: {
-                    onReady: function() {
-                        pauseOnPlay = true;
-                        player.playVideo();
-                        initTimepoints();
-                    },
-                    onStateChange: onPlayerStateChange
-                }
+            var node = $a.find('.player').get(0);
+            youtube.loadVideo(videoId, node).done(function(p) {
+                player = p;
+                initTimepoints();
             });
-            console.log('player', player);
         }
 
         function createTimepoint(time, type, prompt) {
+            console.log('duration', duration);
             var v = {
                 type: type,
                 time: time.toFixedDown(1),
-                timeLabel: type=='start' ? 'Start at' : 'Pause at'
+                timeLabel: type=='start' ? 'Start at' : 'Pause at',
+                duration: duration
             };
             if (type == 'single') {
                 v.message = prompt;
                 v.single = true;
             } else if (type == 'multiple') {
-                v.prompts = templates.render('choice', { message: prompt });
+                v.message = prompt;
+                v.target = v.time;
+                v.prompts = templates.render('choice', v);
                 v.multiple = true;
             }
+            console.log('v=', v);
             $item = $(templates.render('timepoint', v));
             return $item;
         }
@@ -165,19 +143,12 @@ define(['templates', 'route', 'state', 'urlon'], function(templates, route, stat
             duration = player.getDuration();
             var $tp = $a.find('.timepoints');
             $tp.find('li:gt(0)').remove();
-            $a.find('.play').attr('disabled', false);
+            //$a.find('.play').attr('disabled', false);
         }
 
         function insertTimepoint($tp) {
             $a.find('.timepoints').append($tp);
             return $tp;
-        }
-
-        function onPlayerStateChange(event) {
-            if (pauseOnPlay && event.data == YT.PlayerState.PLAYING) {
-                player.pauseVideo();
-                pauseOnPlay = false;
-            }
         }
 
         Number.prototype.toFixedDown = function(digits) {
@@ -268,15 +239,16 @@ define(['templates', 'route', 'state', 'urlon'], function(templates, route, stat
                 });
             }
             var messages = $a.find("input[name='message']").map(function() {
-                return $(this).val(); }).get(),
+                    return $(this).val(); }).get(),
                 vocabulary = unique(messages).join(', '),
+                tags = [ tab ];
+            if (tab == 'precise') tags.push('error free');
                 g = {
-                    title: $("input[name='title']").val(),
-                    rating: $("select[name='rating']").val(),
-                    ytid: $a.find("input[name='video']").val(),
+                    ytid: videoId,
                     duration: duration,
                     vocabulary: vocabulary,
-                    link: getPlayLink()
+                    link: getPlayLink(),
+                    tags: tags
                 };
             return g;
         }
@@ -335,6 +307,9 @@ define(['templates', 'route', 'state', 'urlon'], function(templates, route, stat
                 sv = $s.find(":selected").val();
             console.log('sc', $s, sv);
             $s.siblings('input[name=target]').toggle(sv == 'jump');
+        })
+        .on('keydown', 'input', function(e) {
+            $a.find('.play').prop('disabled', $a.find('.timepoints input:invalid').length > 0);
         });
 
         $a.find('.loadVideo').on('click', loadVideo);
@@ -374,6 +349,9 @@ define(['templates', 'route', 'state', 'urlon'], function(templates, route, stat
         tabInit('advanced');
         saveInit();
         $.getScript('https://www.youtube.com/iframe_api');
+        youtube.loadApi().done(function() {
+            $(document).trigger('apiReady')
+        });
     }
 
     route.add('init', /^\/create\/(?:\?id=(\d+)|\?copy=(\d+))?$/, creatorInit);

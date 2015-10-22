@@ -53,7 +53,7 @@
                 </ul>
 
             </div>
-            <button class="play thr-blue-button">Play</button>
+            <button class="play thr-blue-button" disabled>Play</button>
 
         </div>
 
@@ -72,7 +72,7 @@
                 </ul>
 
             </div>
-            <button class="play thr-blue-button">Play</button>
+            <button class="play thr-blue-button" disabled>Play</button>
 
         </div>
 
@@ -82,19 +82,32 @@
         <h2>Save your Gameplay</h2>
         <p>You can play and share your gameplay by clicking the <em>Play</em> button above to open a new window. If you copy and share the URL of that window, anyone may enjoy your gameplay. You may also share your gameplay on our site by submitting the following form:</p>
         <form id="save-gameplay">
-            <div>
-                <label>Title
-                    <input type="text" name="title" placeholder="Title for your gameplay" />
-                </label>
-            </div>
-            <div>
-                <label>Audience rating
-                    <select name="rating">
-                        <option value="E">E/Everybody</option>
-                        <option value="C">C/Caution</option>
-                    </select>
-                </label>
-            </div>
+            <label>Title
+                <input type="text" name="title" placeholder="Title for your gameplay" required />
+            </label>
+            <label>Author
+                <input type="text" name="author" placeholder="Author pseudonym" required />
+            </label>
+            <label>Audience rating
+                <select name="audience">
+                    <option value="E">E/Everybody</option>
+                    <option value="C">C/Caution</option>
+                </select>
+            </label>
+            <label>Topic
+                <select name="topic">
+                    <option value="">None</option>
+                    {{#topics}}
+                    <option value="{{value}}">{{label}}</option>
+                    {{/topics}}
+                </select>
+            </label>
+            <label>Language
+                <select name="language">
+                    {{#languages}}
+                    <option value="{{value}}">{{label}}</option>
+                    {{/languages}}
+                </select>
             <div id="errors"></div>
             <div id="messages"></div>
             <button id="save" type="submit" class="thr-blue-button">Save</button>

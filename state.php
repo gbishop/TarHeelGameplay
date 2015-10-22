@@ -111,7 +111,7 @@ function setTHR($p, $v) {
 function find_url($page = null) {
     global $THRState;
     $p = array();
-    foreach(array('search', 'category', 'reviewed', 'audience', 'language') as $parm) {
+    foreach(array('search', 'category', 'audience', 'language') as $parm) {
         $v = urlencode($THRState[$parm]);
         $p[] = "$parm=$v";
     }

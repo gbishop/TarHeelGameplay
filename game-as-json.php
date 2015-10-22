@@ -1,8 +1,8 @@
 <?php
 /*
-Template Name: BookAsJson
+Template Name: GameAsJson
 
-GET: Return the json for a book
+GET: Return the json for a gameplay
 */
 
 if($_SERVER['REQUEST_METHOD'] == 'GET') {
@@ -17,7 +17,7 @@ if($_SERVER['REQUEST_METHOD'] == 'GET') {
     } else {
         $slug = getParam('slug', '', '/[^\/]+/');
         if ($slug) {
-            query_posts("cat=3&name=$slug");
+            query_posts("name=$slug");
             if(have_posts()) {
                 the_post();
             } else {
@@ -29,7 +29,7 @@ if($_SERVER['REQUEST_METHOD'] == 'GET') {
             die();
         }
     }
-    $book = ParseBookPost($post);
+    $book = ParseGameplayPost($post);
     if (!$book) {
         header("HTTP/1.0 404 Not Found");
         die();
@@ -44,7 +44,7 @@ if($_SERVER['REQUEST_METHOD'] == 'GET') {
     // posting a new or updated book
     $id = getParam('id', 0, '/\d+/', 'post');
     $publish = getParam('publish', 'false', '/false|true/', 'post');
-    $content = json_decode(getParam('book', '', null, 'post'), true);
+    $content = json_decode(getParam('gameplay', '', null, 'post'), true);
     // validate user
     if (!is_user_logged_in() || !current_user_can('publish_posts') || ($id && !current_user_can('edit_post', $id))) {
         header("HTTP/1.0 401 Not Authorized");
@@ -66,12 +66,6 @@ if($_SERVER['REQUEST_METHOD'] == 'GET') {
     $canPublish = $canPublish && strlen($book['title']) > 0;
     $book['author'] = trim($content['author']);
     $canPublish = $canPublish && strlen($book['author']) > 0;
-    // validate type
-    if (!in_array($content['type'], array('T', 'C', 'O', ' '))) {
-        header("HTTP/1.0 400 Bad Type");
-        die();
-    }
-    $book['type'] = $content['type'];
     // validate audience
     if (!in_array($content['audience'], array('E', 'C', ' '))) {
         header("HTTP/1.0 400 Bad Audience");
@@ -79,7 +73,7 @@ if($_SERVER['REQUEST_METHOD'] == 'GET') {
     }
     $book['audience'] = $content['audience'];
     // validate reviewed
-    $book['reviewed'] = current_user_can('edit_others_posts') && $content['reviewed'];
+    //$book['reviewed'] = current_user_can('edit_others_posts') && $content['reviewed'];
 
     // validate language
     if (!in_array($content['language'], $LangNameToLangCode) && $content['language'] != ' ') {
@@ -88,39 +82,21 @@ if($_SERVER['REQUEST_METHOD'] == 'GET') {
     }
     $book['language'] = $content['language'];
     $canPublish = $canPublish && $book['language'] != ' ';
-    // validate categories
-    foreach($content['categories'] as $category) {
-        if (!in_array($category, $CategoryAbbrv)) {
-            header("HTTP/1.0 400 Bad Category");
+    // validate tags
+    foreach($content['tags'] as $tag) {
+        if (!term_exists($tag, 'post_tag')) {
+            header("HTTP/1.0 400 Bad Tag");
             die();
         }
     }
-    $book['categories'] = $content['categories'];
-    if ($content['tags']) {
-        $book['tags'] = $content['tags']; // TODO: Validate this
-    }
-    // validate pages
-    $pageNo = 1;
-    $pages = array();
-    foreach($content['pages'] as $page) {
-        if ($pageNo == 1 && $page['text'] != $book['title']) {
-            header("HTTP/1.0 400 Bad Page");
-            die();
-        }
-        $p = make_page(trim($page['text']), $page['url']);
-        if ($p === false) {
-            header("HTTP/1.0 500 Cache failure");
-            die();
-        }
-        $canPublish = $canPublish && strlen($p['text']) > 0;
-        $pages[] = $p;
-        $pageNo += 1;
-    }
-    $book['pages'] = $pages;
-    $canPublish = $canPublish && count($pages) > 3;
+    $book['tags'] = $content['tags'];
+    $book['vocabulary'] = $content['vocabulary'];
+    $book['ytid'] = $content['ytid'];
+    $book['glink'] = $content['link'];
+    $book['duration'] = $content['duration'];
 
     $book['status'] = $publish && $canPublish ? 'publish' : 'draft';
-    $book = SaveBookPost($id, $book);
+    $book = SaveGameplayPost($id, $book);
     if ($book === false) {
         header("HTTP/1.0 400 Save Post Failed");
         die();
@@ -131,12 +107,6 @@ if($_SERVER['REQUEST_METHOD'] == 'GET') {
     header('Content-Type: application/json');
     header('Content-Size: ' . mb_strlen($output));
     echo $output;
-    if ($book['status'] == 'publish') {
-        updateSpeech($book, 1, 2);  // generate audio for first two pages
-        // then asynchronously generate speech for other pages
-        $cmd = "/usr/bin/php " . ABSPATH . "theme/updateSpeech.php $id 3 > /tmp/updateSpeech.out &";
-        exec($cmd);
-    }
     die();
 }
 ?>

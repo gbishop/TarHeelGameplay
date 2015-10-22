@@ -4,7 +4,7 @@
     </button>
     <label>Choice:
         <input type="text" name="message" value="{{message}}"
-            placeholder="Enter message" />
+            placeholder="Enter message" required />
     </label>
     <label>Action:
         <select name="action">
@@ -14,7 +14,7 @@
             <option value="jump">Jump to:</option>
         </select>
         <input type="number" name="target" value="{{target}}"
-            placeholder="Time" />
+            placeholder="Time" min="0" max="{{duration}}" step="0.1" />
     </label>
     <button class="add-choice picon" title="add choice">
         <i class="fa fa-plus-square"></i>

@@ -1,12 +1,14 @@
 <li class="tp-{{type}}">
     <label>{{timeLabel}}:
-        <input type="number" name="time" value="{{time}}" step="0.1"
-            placeholder="Enter time" title="Use up and down arrow to adjust the time. Use shift for bigger steps." />
+        <input type="number" name="time" value="{{time}}"
+            step="0.1" min="0" max={{duration}} required
+            placeholder="Enter time"
+            title="Use up and down arrow to adjust the time. Use shift for bigger steps." />
     </label>
     {{#single}}
     <label>Prompt:
         <input type="text" name="message" value="{{message}}"
-            placeholder="Enter message" />
+            placeholder="Enter message" required />
     </label>
     {{/single}}
     <button class="delete-pause picon" title="delete pause">

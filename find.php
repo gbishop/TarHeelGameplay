@@ -7,24 +7,30 @@ GET: Return a list of books that match the query
 ?>
 <?php
 $count = 24;
+$cp1 = $count + 1;
+$mq = array(
+    'relation' => 'AND',
+    array(
+        'key' => 'language',
+        'value' => THR('language'))
+);
+if (THR('audience'))
+    $mq[] = array(
+        'key' => 'audience',
+        'value' => THR('audience'));
 $args = array(
     's'                => THR('search'),
-    'posts_per_page'   => $count,
-    'offset'           => 0,
-    'category'         => '',
+    'posts_per_page'   => $cp1,
+    'offset'           => (THR('page') - 1) * $count,
     'category_name'    => 'Gameplays',
+    'tag'              => THR('category'),
+    'meta_query'       => $mq,
     'orderby'          => 'date',
     'order'            => 'DESC',
-    'include'          => '',
-    'exclude'          => '',
-    'meta_key'         => '',
-    'meta_value'       => '',
     'post_type'        => 'post',
-    'post_mime_type'   => '',
-    'post_parent'      => '',
-    'author'       => '',
     'post_status'      => 'publish'
 );
+
 $posts = get_posts($args);
 $nrows = count($posts);
 $json = 0;

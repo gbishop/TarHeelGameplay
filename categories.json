@@ -1,6 +1,9 @@
 [
-        { "label": "_(Video Games)", "value": "video-games" },
+        { "label": "_(Cartoons)", "value": "cartoons" },
+        { "label": "_(Machines)", "value": "machines" },
         { "label": "_(Science)", "value": "science" },
         { "label": "_(Social Stories)", "value": "social-stories" },
-        { "label": "_(Sports)", "value": "sports" }
+        { "label": "_(Sports)", "value": "sports" },
+        { "label": "_(Video Games)", "value": "video-games" },
+        { "label": "_(Video)", "value": "video" }
 ]

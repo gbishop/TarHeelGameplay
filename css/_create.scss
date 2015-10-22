@@ -71,6 +71,10 @@ ul.tabs li.current{
             padding: 0.25em;
             margin-bottom: 0;
             border: 1px solid black;
+
+            &:invalid {
+                border-color: red;
+            }
         }
 
         input[type=text], #creator select {
@@ -86,7 +90,7 @@ ul.tabs li.current{
         }
 
         label {
-            /*display: inline-block;*/
+            display: inline-block;
             margin-right: 1em;
         }
 
@@ -141,4 +145,9 @@ ul.tabs li.current{
         }
 
     }
+
+    #save-gameplay label {
+        margin-bottom: 1em;
+    }
+
 }

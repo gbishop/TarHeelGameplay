@@ -673,11 +673,7 @@ from {transform: rotate(0deg);}
 to {transform: rotate(359deg);}
 }
 
-@import "css/fileuploader";
 @import "css/create";
+@import "css/gameplay";
 @import "css/yourbooks";
-@import "css/collections";
 @import "css/allmediaqueries";
-@import "css/map-page";
-@import "css/ie";
-@import "css/offline";

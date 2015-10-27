@@ -308,13 +308,15 @@ function ParseGameplayPost($post) {
     $res['status'] = $post->post_status;
 
     $ytid = $res['ytid'] = get_post_meta($id, 'ytid', true);
-    $res['glink'] = get_post_meta($id, 'link', true);
+    $res['gamedata'] = get_post_meta($id, 'gamedata', true);
     $res['duration'] = get_post_meta($id, 'duration', true);
     if (!$res['duration']) $res['duration'] = '?';
     $res['language'] = get_post_meta($id, 'language', true);
     if (!$res['language']) $res['language'] = 'en';
     $res['audience'] = get_post_meta($id, 'audience', true);
     if (!$res['audience']) $res['audience'] = 'E';
+    $res['dof'] = get_post_meta($id, 'dof', true);
+    $res['hits'] = get_post_meta($id, 'hits', true);
 
     $res['modified'] = $post->post_modified;
     $res['created'] = $post->post_date;
@@ -352,11 +354,13 @@ function SaveGameplayPost($id, $book) {
     $book['ID'] = $id;
 
     update_post_meta($id, 'ytid', $book['ytid']);
-    update_post_meta($id, 'link', $book['glink']);
+    update_post_meta($id, 'gamedata', $book['gamedata']);
     update_post_meta($id, 'duration', $book['duration']);
     update_post_meta($id, 'author_pseudonym', $book['author']);
     update_post_meta($id, 'language', $book['language']);
     update_post_meta($id, 'audience', $book['audience']);
+    update_post_meta($id, 'dof', $book['dof']);
+    update_post_meta($id, 'hits', $book['hits']);
 
     $log->logError(print_r($id, true));
     $post = get_post($id);
@@ -482,11 +486,10 @@ function posts_to_find_results($posts, $nrows, $count) {
         $po['author'] = $g['author'];
         $po['link'] = $g['link'];
         $po['ytid'] = $g['ytid'];
-        $po['glink'] = $g['glink'];
         $po['preview'] = $g['preview'];
         $po['thumbnail'] = $g['thumbnail'];
         $po['caution'] = $g['audience'] == 'C';
-        $po['duration'] = $g['duration'];
+        $po['hits'] = $g['hits'];
         $gameplays[] = $po;
     }
 

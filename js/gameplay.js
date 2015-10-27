@@ -5,7 +5,9 @@ define(["route", "state", "youtube", "urlon"], function(route, state, youtube, u
     // data structure for a game
     var game = {
         videoId: 'ia8bhFoqkVE',
+        vocabulary: "Go! Stop! Yes? No? Again Quit",
         start: 8.6,
+        duration: 60,
         timePoints: [
             {
                 // prompt with 2 choices
@@ -17,7 +19,7 @@ define(["route", "state", "youtube", "urlon"], function(route, state, youtube, u
                     },
                     {
                         prompt: 'Stop!',
-                        next: 9.9 // jump to here label creating a loop
+                        next: 9.9
                     }
                 ]
             },
@@ -57,9 +59,25 @@ define(["route", "state", "youtube", "urlon"], function(route, state, youtube, u
 
     function init() {
         console.log('init');
-        // parse the query string and construct the game object
-        if (window.location.search) {
-            game = initializeGame(window.location.search);
+        if (window.game_init) {
+            game = window.game_init;
+            console.log('game', game);
+            if (game.interval) {
+                game.timePoints = [];
+                var t = game.start + game.interval;
+                while(t < game.end) {
+                    game.timePoints.push({
+                        time: t,
+                        choices: [ {prompt: game.message, next: 0} ]
+                    });
+                    t += game.interval;
+                }
+                game.timePoints.push({
+                    time: game.end,
+                    choices: [ {prompt: 'Again', next: -1} ]
+                });
+                console.log('tps', game);
+            }
         }
         $apiReady = youtube.loadApi();
         initHandlers();
@@ -231,117 +249,6 @@ define(["route", "state", "youtube", "urlon"], function(route, state, youtube, u
         }
         nextTimePoint = getNext(player.getCurrentTime());
         player.playVideo();
-    }
-
-    function initializeGame(search) {
-        var q = {};
-        if (location.search.indexOf('?_') == 0) {
-            // URLON representation of the data structure
-            q = URLON.parse(location.search.substr(1));
-            //console.log('q=', q);
-            // construct the game object here
-            var tps = [];
-            $.each(q.t, function(k, v) {
-                var tp = { time: parseFloat(k) };
-                if (typeof(v) === 'number') {
-                    tp.choices = [ { prompt: q.m[v], next: 0 }];
-                } else {
-                    tp.choices = [];
-                    $.each(v, function(p, n) {
-                        tp.choices.push({ prompt: q.m[p], next: n });
-                    });
-                }
-                tps.push(tp);
-            });
-            tps.sort(function(a, b) {
-                if (a.time < b.time) return -1;
-                if (a.time > b.time) return 1;
-                return 0;
-            });
-            // function to add a timepoint at the end
-            function onFirstPlay() {
-                var duration = player.getDuration();
-                game.timePoints.push({
-                    time: duration,
-                    choices: [
-                        { prompt: 'Again', next: -1 }
-                    ]
-                });
-            }
-            return {
-                videoId: q.v,
-                start: q.s,
-                timePoints: tps,
-                onFirstPlay: onFirstPlay
-            }
-        } else {
-            return initializeGameFromForm(search);
-        }
-    }
-
-    function initializeGameFromForm(search) {
-        // form representation
-        // apply defaults and types to the query parameters
-        var defaults = {
-            start: 0,
-            end: 3600,
-            message: 'Go!',
-            interval: 15,
-            video: 'ln_WjVLEJtc'
-        };
-        q = (function(a, def) {
-            if (a == "") return {};
-            var b = $.extend({}, def);
-            for (var i = 0; i < a.length; ++i)
-            {
-                var p=a[i].split('=', 2);
-                if (p.length == 1)
-                    b[p[0]] = "";
-                else
-                    b[p[0]] = decodeURIComponent(p[1].replace(/\+/g, " "));
-                if (typeof(def[p[0]]) == 'number') {
-                    b[p[0]] = parseFloat(b[p[0]]);
-                }
-            }
-            return b;
-        })(search.substr(1).split('&'), defaults);
-        console.log('q=', q);
-        // convert URL to videoID
-        var videoId = q.video;
-        console.log(videoId);
-        var regExp = /^.*(youtube\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-        var match = videoId.match(regExp);
-        console.log(match);
-        if (match && match[2].length == 11) {
-          videoId = match[2];
-        }
-        console.log(videoId);
-        q.video = videoId;
-
-        // setup a function to build the table when the duration is known after video is loaded
-        function onFirstPlay() {
-            var duration = player.getDuration();
-            if (q.end) {
-                duration = Math.min(duration, q.end);
-            }
-            if (!q.start) {
-                q.start = 0;
-            }
-            //console.log('duration', duration);
-            for(var t = q.start + q.interval; t < duration; t += q.interval) {
-                game.timePoints.push({ time: t,
-                                       choices: [{prompt: q.message}] });
-            }
-            game.timePoints.push({time: duration,
-                                  choices: [{prompt: "Again!", next: -1 }]});
-            console.log('tp', game.timePoints);
-        }
-        return {
-            videoId: q.video,
-            start: q.start,
-            timePoints: [ ],
-            onFirstPlay: onFirstPlay
-        };
     }
 
     function initHandlers() {

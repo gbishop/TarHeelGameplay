@@ -11,7 +11,7 @@
     <ul class="thr-book-list">
         {{#gameplays}}
         <li class="selectable thr-colors" data-preview="{{preview}}" data-id="{{ID}}" lang="{{language}}" data-bust="{{bust}}">
-            <a href="{{glink}}" target="_blank">
+            <a href="/play/?id={{ID}}" target="_blank">
                 <h2>{{title}}</h2>
                 <p class="thr-author">{{author}}</p>
                 {{#caution}}
@@ -21,7 +21,7 @@
                 <div class="thr-thumb-box">
                     <img src="{{thumbnail}}" class="thr-thumb" alt=" " />
                 </div>
-                <p class="thr-pages">{{duration}}</p>
+                <p class="thr-pages">{{hits}}</p>
             </a>
             <img src="/theme/images/FavoriteYesOverlay.png" class="favoriteYes" alt=" "/>
             <img src="/theme/images/FavoriteNoOverlay.png" class="favoriteNo" alt=" "/>

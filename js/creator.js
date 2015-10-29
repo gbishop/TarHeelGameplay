@@ -435,7 +435,6 @@ require(['templates', 'route', 'state', 'youtube'],
                         });
                 }
             });
-            $.getScript('https://www.youtube.com/iframe_api');
         }
 
         route.add('init', /^\/create\/.*$/, creatorInit);

@@ -11,6 +11,7 @@
     <title><?php thr_title(); ?></title>
     <link rel="shortcut icon" href="/theme/images/favicon.ico">
     <link rel="apple-touch-icon" href="/theme/images/apple-touch-icon.png">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.11.4/themes/start/jquery-ui.css">
     <link rel="stylesheet" href="/theme/style.css">
     <?php
         $view = array(
@@ -25,7 +26,7 @@
     ?>
     <script src="/theme/js/modernizr.custom.js"></script>
     <script src="//code.jquery.com/jquery-2.1.1.min.js"></script>
-
+    <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
     <script>
         var require = { waitSeconds: 200 };
         if (!window.console) window.console = {};

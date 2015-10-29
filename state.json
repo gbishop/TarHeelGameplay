@@ -12,5 +12,6 @@
     "fpage": { "pattern": "^\\d+$", "default": "1" },
     "page": { "pattern": "^\\d+$", "default": "1" },
     "findAnotherLink": { "pattern": "", "default": "/find/" },
-    "debug": { "pattern": "^[01]$", "default": "0" }
+    "debug": { "pattern": "^[01]$", "default": "0" },
+    "escape": { "pattern": "^[01]$", "default": "0" }
 }

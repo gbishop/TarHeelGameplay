@@ -8,7 +8,7 @@ define([
     "busy",
     "navigation",
     "help",
-    "yourbooks"
+    "yourgames"
     ],
     function(route, state, controller) {
         $(function() {

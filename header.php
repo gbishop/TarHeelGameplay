@@ -12,6 +12,17 @@
     <link rel="shortcut icon" href="/theme/images/favicon.ico">
     <link rel="apple-touch-icon" href="/theme/images/apple-touch-icon.png">
     <link rel="stylesheet" href="/theme/style.css">
+    <?php
+        $view = array(
+            'pageColor'=>THR('pageColor'),
+            'textColor'=>THR('textColor')
+        );
+        echo template_render('styleColor', $view);
+
+        if (THR('debug')) {
+            echo '    <script src="http://152.2.129.207:8008/target/target-script-min.js#anonymous"></script>';
+        }
+    ?>
     <script src="/theme/js/modernizr.custom.js"></script>
     <script src="//code.jquery.com/jquery-2.1.1.min.js"></script>
 

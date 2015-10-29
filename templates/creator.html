@@ -1,13 +1,14 @@
 <div id="creator">
+    {{{script}}}
     <ul class="tabs">
-        <li class="tab-link current" data-tab="quick">Basic</li>
+        <li class="tab-link current" data-tab="basic">Basic</li>
         <li class="tab-link" data-tab="precise">Precise</li>
         <li class="tab-link" data-tab="advanced">Advanced</li>
     </ul>
-    <div id="quick" class="tab-content current">
+    <div id="basic" class="tab-content current">
         <p>On this tab you can quickly create a basic interactive gameplay with a fixed interval between prompts.</p>
 
-        <form id="quick-gameplay">
+        <form id="basic-gameplay">
             <label>YouTube Video ID (or URL)
                 <input type="text" name="video" value="{{videoId}}" required
                        pattern="[a-zA-Z0-9_-]{11}" />
@@ -30,7 +31,7 @@
                 <input type="number" name="start" min="0" step="0.1" placeholder="seconds"
                     value="{{start}}" required />
             </label>
-            <label>Optional end time:
+            <label>End time:
                 <input type="number" name="end" min="0" step="0.1" placeholder="seconds"
                     value="{{end}}" required />
             </label>
@@ -109,7 +110,12 @@
             </label>
             <div id="errors"></div>
             <div id="messages"></div>
-            <button id="save" type="submit" class="thr-blue-button">Save</button>
+            <!--
+            <button type="button" id="draft" type="submit" class="thr-blue-button">
+                Save as draft</button>
+            -->
+            <button type="button" id="publish" type="submit" class="thr-blue-button">
+                Publish</button>
         </form>
     {{/loggedin}}
 </div>

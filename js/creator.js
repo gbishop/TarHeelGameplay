@@ -66,9 +66,16 @@ require(['templates', 'route', 'state', 'youtube', 'urlon'],
             });
         }
 
+        Number.prototype.toFixedDown = function(digits) {
+            var re = new RegExp("(\\d+\\.\\d{" + digits + "})(\\d)"),
+                m = this.toString().match(re);
+            return m ? parseFloat(m[1]) : this.valueOf();
+        };
+
         function tabInit($tab) {
             // initialize the player and its controls
-            var player;
+            var player = null,
+                duration = 0;
 
             var $video = $tab.find("input[name='video']");
             $video.on('input', function(e) {
@@ -85,11 +92,15 @@ require(['templates', 'route', 'state', 'youtube', 'urlon'],
                 console.log('videoId=', videoId);
                 $tab.find('.player').replaceWith('<div class="player"></div>');
                 var node = $tab.find('.player').get(0);
+                var $def = $.Deferred();
                 youtube.loadVideo(videoId, node).done(function(p) {
                     player = p;
+                    duration = player.getDuration().toFixedDown(1);
                     initTimepoints();
                     $tab.find('button.add-pause').prop('disabled', false);
+                    $def.resolve();
                 });
+                return $def;
             }
             $tab.find('button.loadVideo').on('click', loadVideo);
 
@@ -101,7 +112,7 @@ require(['templates', 'route', 'state', 'youtube', 'urlon'],
                         value = parseFloat($target.val()),
                         step = evt.shiftKey ? 1 : 0.1,
                         sign = evt.keyCode == 38 ? 1 : -1;
-                    value = Math.min(player.getDuration(), Math.max(0, value + sign * step));
+                    value = Math.min(duration, Math.max(0, value + sign * step));
                     value = Math.round(value * 10) / 10;
                     $target.val(value.toFixed(1));
                     if (player) player.seekTo(value);
@@ -119,10 +130,10 @@ require(['templates', 'route', 'state', 'youtube', 'urlon'],
             });
 
             // saving
-            $tab.on('save', function(e, saveFunc) {
+            $tab.on('save', function(e, saveFunc, publish) {
                 e.preventDefault();
                 var g = extractGameplay();
-                saveFunc(g, true);
+                saveFunc(g, publish);
             });
 
             // playing
@@ -134,7 +145,7 @@ require(['templates', 'route', 'state', 'youtube', 'urlon'],
             var extractGameplay = null,
                 enablePlay = null,
                 initTimepoints = null;
-            if ($tab.prop('id') == 'quick') {
+            if ($tab.prop('id') == 'basic') {
                 console.log('basic init');
 
                 extractGameplay = function() {
@@ -149,7 +160,7 @@ require(['templates', 'route', 'state', 'youtube', 'urlon'],
                     gp.vocabulary = gp.message;
                     gp.tags = [ 'basic', 'error-free' ];
                     if (!gp.end) {
-                        gp.end = player.getDuration();
+                        gp.end = duration;
                     }
                     gp.duration = gp.end - gp.start;
                     gp.dof = 1;
@@ -162,20 +173,37 @@ require(['templates', 'route', 'state', 'youtube', 'urlon'],
                     var invalid = $tab.find("input:invalid").length > 0;
 
                     $tab.find('button.play').prop('disabled', invalid);
+                    console.log('enablePlay', invalid);
                 };
                 enablePlay();
-                $tab.find('#quick-gameplay input').on('input', enablePlay);
+                $tab.find('#basic-gameplay input').on('input', enablePlay);
 
                 initTimepoints = function() {
-                    $tab.find('input[name=end]').val(Math.floor(player.getDuration()));
+                    $tab.find('input[name=end]').val(duration);
                     enablePlay();
                 };
+
+                $tab.on('loadGameplay', function(e, gp) {
+                    console.log('loadGameplay basic');
+                    $tab.find('input[name=video]').val(gp.videoId);
+                    enableLoad();
+                    console.log('before loadVideo');
+                    loadVideo().done(function() {
+                        $tab.find('input[name=start]').val(gp.start);
+                        $tab.find('input[name=interval]').val(gp.interval);
+                        $tab.find('input[name=end]').val(gp.end);
+                        $tab.find('input[name=message]').val(gp.message);
+                        enablePlay();
+                        console.log('after enablePlay');
+                    });
+                });
 
 
             } else {
                 var version = $tab.prop('id');
                 console.log('advanced and precise init');
                 function createTimepoint(time, type, prompt) {
+                    console.log('cT', time, type, prompt);
                     var v = {
                         type: type,
                         time: time.toFixedDown(1),
@@ -186,9 +214,22 @@ require(['templates', 'route', 'state', 'youtube', 'urlon'],
                         v.message = prompt;
                         v.single = true;
                     } else if (type == 'multiple') {
-                        v.message = prompt;
-                        v.target = v.time;
-                        v.prompts = templates.render('choice', v);
+                        prompts = [];
+                        prompt.forEach(function(p, i) {
+                            var v = {
+                                message: p.prompt
+                            };
+                            var action = p.next;
+                            if (p.next > 0) {
+                                v.target = p.next;
+                                action = 'jump';
+                            }
+                            v['select' + action] = 'selected';
+                            var choice = templates.render('choice', v);
+                            console.log('choice', choice);
+                            prompts.push(choice);
+                        });
+                        v.prompts = prompts.join('\n');
                         v.multiple = true;
                     }
                     console.log('v=', v);
@@ -196,9 +237,7 @@ require(['templates', 'route', 'state', 'youtube', 'urlon'],
                     return $item;
                 };
 
-                var duration = 0;
                 initTimepoints = function() {
-                    duration = player.getDuration();
                     var $tp = $tab.find('.timepoints');
                     $tp.find('li:gt(0)').remove();
                     $tp.append(createTimepoint(0, 'start', ''));
@@ -209,20 +248,19 @@ require(['templates', 'route', 'state', 'youtube', 'urlon'],
                     return $tp;
                 }
 
-                Number.prototype.toFixedDown = function(digits) {
-                    var re = new RegExp("(\\d+\\.\\d{" + digits + "})(\\d)"),
-                        m = this.toString().match(re);
-                    return m ? parseFloat(m[1]) : this.valueOf();
-                };
-
                 function scrollIntoView($tp) {
                     $tp.parent().scrollTop($tp.offset().top);
                 }
 
                 function addTimepoint() {
                     var t = player && player.getCurrentTime() || 0,
-                        kind = version == 'precise' ? 'single' : 'multiple',
-                        $tp = createTimepoint(t, kind, '');
+                        $tp
+                    if (version == 'precise') {
+                        $tp = createTimepoint(t, 'single', '');
+                    } else {
+                        $tp = createTimepoint(t, 'multiple',
+                            [{prompt: "", next: 0}]);
+                    }
                     insertTimepoint($tp);
                     scrollIntoView($tp);
                     enablePlay();
@@ -306,7 +344,8 @@ require(['templates', 'route', 'state', 'youtube', 'urlon'],
                 }
 
                 enablePlay = function() {
-                    var invalid = $tab.find('.timepoints input:invalid').length > 0;
+                    var invalid = $tab.find('input:invalid').length > 0;
+                    console.log('enablePlay', invalid);
                     $tab.find('button.play').prop('disabled', invalid);
                 }
                 $tab.find('.timepoints')
@@ -333,15 +372,47 @@ require(['templates', 'route', 'state', 'youtube', 'urlon'],
                 $tab.find('i.fa-info-circle').on('click', function() {
                     $(this).next('div.help').toggle();
                 });
+
+                $tab.on('loadGameplay', function(e, gp) {
+                    var tab = $tab.prop('id');
+                    console.log('loadGameplay', tab);
+                    $tab.find('input[name=video]').val(gp.videoId);
+                    enableLoad();
+                    loadVideo().done(function() {
+                        $tab.find('.tp-start input[name=time]').val(gp.start);
+                        gp.timePoints.forEach(function(tp, i) {
+                            console.log('tp', tp);
+                            var $tp;
+                            if (tab == 'precise') {
+                                $tp = createTimepoint(tp.time, 'single', tp.choices[0].prompt);
+                            } else {
+                                $tp = createTimepoint(tp.time, 'multiple', tp.choices)
+                            }
+                            insertTimepoint($tp);
+                        });
+                        enablePlay();
+                    });
+                });
             }
         };
 
         function saveInit() {
-            $('#save-gameplay').on('submit', function(e) {
-                e.preventDefault();
+            $('#draft').on('click', function(e) {
                 var $tab = $('.tab-content.current');
-                $tab.trigger('save', [saveGameplay])
+                $tab.trigger('save', [saveGameplay, false])
             });
+            $('#publish').on('click', function(e) {
+                var $tab = $('.tab-content.current');
+                $tab.trigger('save', [saveGameplay, true])
+            });
+            function enableSave() {
+                var $tab = $('.tab-content.current'),
+                    invalid = $('#save-gameplay input:invalid').length > 0 ||
+                        $tab.find('button.play').prop('disabled');
+                $('#publish').prop('disabled', invalid);
+            }
+            $(document).on('input', enableSave);
+            enableSave();
         }
 
         function tabController() {
@@ -364,6 +435,18 @@ require(['templates', 'route', 'state', 'youtube', 'urlon'],
             youtube.loadApi().done(function() {
                 tabController();
                 saveInit();
+                if (window.game_init) {
+                    var gp = window.game_init,
+                        kind = gp.kind;
+                    $('.tab-link[data-tab=' + kind + ']').click();
+                    console.log('loading', gp, kind);
+                    $('#' + kind + '.tab-content').trigger('loadGameplay', [gp]);
+                    $('input[name=title]').val(gp.title);
+                    $('input[name=author').val(gp.author);
+                    $('select[name=audience]').val(gp.audience);
+                    $('select[name=topic').val(gp.topic);
+                    $('select[name=language').val(gp.language);
+                }
             });
             $.getScript('https://www.youtube.com/iframe_api');
         }

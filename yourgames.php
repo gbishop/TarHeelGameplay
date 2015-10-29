@@ -1,6 +1,6 @@
 <?php
 /*
-Template Name: YourBooks
+Template Name: YourGames
 */
 ?>
 <?php
@@ -130,9 +130,9 @@ if($userid != 0) {
     $view['user'] = $userid;
 
     // list drafts
-    $BookCat = get_cat_id('Books');
+    $BookCat = get_cat_id('Gameplays');
     $my_drafts = query_posts("cat=$BookCat&author=$userid&orderby=title&posts_per_page=-1&post_status=draft");
-    $drafts_list = Array();
+    $drafts = Array();
     foreach ($my_drafts as $post) {
         $drafts[] = Array(
             'title' => $post->post_title,
@@ -155,24 +155,8 @@ if($userid != 0) {
     }
     $view['published'] = $published;
     $view['has_published'] = count($published) > 0;
-
-    // list collections
-    $view['count'] = count(splitFavorites(THR('favorites')));
-
-    $rows = $wpdb->get_results("SELECT ID, title, description, slug, owner, booklist FROM $collections_table WHERE owner = $userid");
-
-    $mycols = array();
-    foreach ($rows as $row) {
-        $mycols[] = array(
-            'title' => $row->title,
-            'ID' => $row->ID,
-            'description' => $row->description,
-            'count' => count(splitFavorites($row->booklist)),
-            'slug' => $row->slug);
-    }
-    $view['collections'] = $mycols;
 }
 
-echo template_render('yourbooks', $view);
+echo template_render('yourgames', $view);
 thr_footer();
 ?>

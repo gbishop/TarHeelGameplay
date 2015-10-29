@@ -1,6 +1,7 @@
+<!--single.php-->
 <?php
-if (in_category('books')):
-    include('single-book.php');
+if (in_category('gameplays')):
+    include('single-gameplay.php');
 else:
     thr_header('');
     if (have_posts()) : while (have_posts()) : the_post(); ?>

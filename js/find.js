@@ -180,7 +180,7 @@ define([ "route",
             else
                 link = selected.find('a');
             console.log('clicking', link);
-            window.open(link.attr('href'), '_blank');
+            window.location.href = link.attr('href');
         }
     });
 

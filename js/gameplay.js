@@ -72,23 +72,32 @@ define(["route", "state", "youtube", "urlon"], function(route, state, youtube, u
                     });
                     t += game.interval;
                 }
-                game.timePoints.push({
-                    time: game.end,
-                    choices: [ {prompt: 'Again', next: -1} ]
+            } else {
+                game.timePoints.sort(function(a,b) {
+                    if (a.time < b.time) return -1;
+                    if (a.time > b.time) return 1;
+                    return 0;
                 });
-                console.log('tps', game);
             }
+            game.timePoints.push({
+                time: game.duration,
+                choices: [
+                    {prompt: 'Again', next: -1},
+                    {prompt: 'Quit', next: -2} ]
+            });
+            console.log('tps', game.timePoints);
+
+            $apiReady = youtube.loadApi();
+            initHandlers();
+            $apiReady.done(Go);
         }
-        $apiReady = youtube.loadApi();
-        initHandlers();
-        $apiReady.done(Go);
         console.log('init finish');
     }
 
     var player;
 
     function checkEnded(event) {
-        //console.log('onSC', event);
+        console.log('onSC', event);
         if (event.data == YT.PlayerState.ENDED) {
             atTimePoint(player.getCurrentTime());
         }
@@ -147,7 +156,7 @@ define(["route", "state", "youtube", "urlon"], function(route, state, youtube, u
         var n = game.timePoints.findIndex(function(tp) {
             return now < tp.time;
         });
-        //console.log('getNext', now, n, game.timePoints[n]);
+        console.log('getNext', now, n, game.timePoints[n]);
         return game.timePoints[n];
     }
 
@@ -276,12 +285,17 @@ define(["route", "state", "youtube", "urlon"], function(route, state, youtube, u
             down[evt.keyCode] = true;
             //console.log('kd', evt);
             var $choices = $('#message tr'),
-                $selected = $choices.filter('.selected');
+                $selected = $choices.filter('.selected'),
+                escape = state.get('escape') == '1';
             if (evt.keyCode == 27) { // escape key to quit
                 location.href = state.get('findAnotherLink');
                 return;
             }
-            if (movers.indexOf(evt.keyCode) >= 0) {
+            if (!escape && $choices.length == 1) { // allow any key if only one choice
+                cycleCount = 0;
+                doResponse($selected);
+
+            } else if (movers.indexOf(evt.keyCode) >= 0) {
                 // mover
                 var n = 0;
                 if($selected.length > 0) {
@@ -291,7 +305,7 @@ define(["route", "state", "youtube", "urlon"], function(route, state, youtube, u
                 // count the number of times cycling through the choices
                 // after 3 cycles, offer to quit
                 if (n == 0) cycleCount += 1;
-                if (cycleCount >= 3) {
+                if (escape && cycleCount >= 3) {
                     showPrompt({
                         choices: [
                             { prompt: 'Quit',
@@ -327,4 +341,5 @@ define(["route", "state", "youtube", "urlon"], function(route, state, youtube, u
     }
 
     route.add('init', /^\/play\/.*/, init);
+    route.add('init', /^\/\d+\/\d+\/\d+\/([^\/]+)\/(?:(\d+)\/)?(?:\?.*)?$/, init);
 });

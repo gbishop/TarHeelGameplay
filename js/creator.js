@@ -130,8 +130,7 @@ require(['templates', 'route', 'state', 'youtube'],
             });
 
             // saving
-            $tab.data('save', function(e, saveFunc, publish) {
-                e.preventDefault();
+            $tab.data('save', function(saveFunc, publish) {
                 var g = extractGameplay();
                 return saveFunc(g, publish);
             });

@@ -1,6 +1,6 @@
 // Modify game structure 17 October
 
-define(["route", "state", "youtube", "urlon"], function(route, state, youtube, urlon) {
+define(["route", "state", "youtube"], function(route, state, youtube) {
 
     // data structure for a game
     var game = {

@@ -109,7 +109,7 @@ require(['templates', 'route', 'state', 'youtube'],
                 if (evt.keyCode == 38 || evt.keyCode == 40) { // up or down arrow
                     evt.preventDefault();
                     var $target = $(evt.target),
-                        value = parseFloat($target.val()),
+                        value = parseFloat($target.val() || '0'),
                         step = evt.shiftKey ? 1 : 0.1,
                         sign = evt.keyCode == 38 ? 1 : -1;
                     value = Math.min(duration, Math.max(0, value + sign * step));
@@ -175,6 +175,7 @@ require(['templates', 'route', 'state', 'youtube'],
                 $tab.find('#basic-gameplay input').on('input', enablePlay);
 
                 initTimepoints = function() {
+                    $tab.find('input[name=start]').val(0);
                     $tab.find('input[name=end]').val(duration);
                     enablePlay();
                 };
@@ -194,6 +195,20 @@ require(['templates', 'route', 'state', 'youtube'],
 
             } else {
                 var version = $tab.prop('id');
+                function createChoice(p, tnow) {
+                    var vc = {
+                        message: p.prompt,
+                        target: tnow
+                    };
+                    var action = p.next;
+                    if (p.next > 0) {
+                        vc.target = p.next;
+                        action = 'jump';
+                    }
+                    vc['select' + action] = 'selected';
+                    return templates.render('choice', vc);
+                }
+
                 function createTimepoint(time, type, prompt) {
                     var v = {
                         type: type,
@@ -205,21 +220,8 @@ require(['templates', 'route', 'state', 'youtube'],
                         v.message = prompt;
                         v.single = true;
                     } else if (type == 'multiple') {
-                        prompts = [];
-                        prompt.forEach(function(p, i) {
-                            var v = {
-                                message: p.prompt
-                            };
-                            var action = p.next;
-                            if (p.next > 0) {
-                                v.target = p.next;
-                                action = 'jump';
-                            }
-                            v['select' + action] = 'selected';
-                            var choice = templates.render('choice', v);
-                            prompts.push(choice);
-                        });
-                        v.prompts = prompts.join('\n');
+                        v.prompts = prompt.map(function(p) {
+                            return createChoice(p, v.time); }).join('\n');
                         v.multiple = true;
                     }
                     $item = $(templates.render('timepoint', v));
@@ -317,6 +319,7 @@ require(['templates', 'route', 'state', 'youtube'],
                         vocabulary: unique(messages).join(' '),
                         videoId: videoId,
                         tags: [version],
+                        kind: version,
                         duration: duration // fix this
                     };
                     if (version == 'precise') {
@@ -343,7 +346,12 @@ require(['templates', 'route', 'state', 'youtube'],
                     $(e.currentTarget).closest('li').remove();
                 })
                 .on('click', 'button.add-choice', function(e) {
-                    var n = templates.render('choice', { message: '' });
+                    var $t = $(e.currentTarget),
+                        tnow = $t.closest('li.tp-multiple').find('input[name=time]').val(),
+                        n = createChoice({
+                        prompt: '',
+                        next: 0
+                    }, tnow);
                     $(e.currentTarget).closest('ol').append(n);
                 })
                 .on('change', 'select[name=action]', function(e) {

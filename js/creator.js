@@ -156,6 +156,7 @@ require(['templates', 'route', 'state', 'youtube'],
                     };
                     gp.vocabulary = gp.message;
                     gp.tags = [ 'basic', 'error-free' ];
+                    gp.kind = 'basic';
                     if (!gp.end) {
                         gp.end = duration;
                     }

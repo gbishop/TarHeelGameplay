@@ -18,7 +18,8 @@ define([], function() {
                 },
                 events: {
                     onReady: function() {
-                        player.playVideo();
+                        if (pauseOnPlay)
+                            player.playVideo();
                     },
                     onStateChange: function(event) {
                         if (pauseOnPlay && event.data == YT.PlayerState.PLAYING) {
@@ -32,7 +33,6 @@ define([], function() {
                     }
                 }
             });
-        console.log('player', player);
         return $def;
     }
 

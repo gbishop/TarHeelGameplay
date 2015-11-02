@@ -1,9 +1,14 @@
 <?php
+    // get the id if any
+    global $current_user;
+    get_currentuserinfo();
+
     global $Templates;
 	$view = array(
 		'loggedin' => is_user_logged_in(),
         'topics' => $Templates['categories'],
-        'languages' => $Templates['languages']
+        'languages' => $Templates['languages'],
+        'user' => $current_user->display_name
 	);
     $key = getParam('key', '', null);
     $id = getParam('id', '', null);

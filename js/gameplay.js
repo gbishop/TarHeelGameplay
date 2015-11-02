@@ -62,6 +62,7 @@ define(["route", "state", "youtube"], function(route, state, youtube) {
         if (window.game_init) {
             game = window.game_init;
             console.log('game', game);
+            var end = 0;
             if (game.interval) {
                 game.timePoints = [];
                 var t = game.start + game.interval;
@@ -72,15 +73,17 @@ define(["route", "state", "youtube"], function(route, state, youtube) {
                     });
                     t += game.interval;
                 }
+                end = game.end;
             } else {
                 game.timePoints.sort(function(a,b) {
                     if (a.time < b.time) return -1;
                     if (a.time > b.time) return 1;
                     return 0;
                 });
+                end = game.duration;
             }
             game.timePoints.push({
-                time: game.duration,
+                time: end,
                 choices: [
                     {prompt: 'Again', next: -1},
                     {prompt: 'Quit', next: -2} ]

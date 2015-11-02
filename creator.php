@@ -17,7 +17,9 @@
         $json = get_post_meta(1, $key, true);
         $script = "<script>window.game_init=$json; </script>";
     } elseif($id) {
-        $json = get_post_meta($id, 'gamedata', true);
+        $post = get_post($id);
+        $gameplay = ParseGameplayPost($post);
+        $json = json_encode($gameplay);
         $script = "<script>window.game_init=$json; </script>";
     }
     $view['script'] = $script;

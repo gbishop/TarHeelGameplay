@@ -17,7 +17,7 @@ require(['templates', 'route', 'state', 'youtube'],
             return v;
         }
 
-        var slug = null;
+        var gameplay_id = 0;
         var videoID = '';
 
         // save a gameplay as sharable on the site
@@ -38,13 +38,15 @@ require(['templates', 'route', 'state', 'youtube'],
             gp.title = $('input[name=title]').val();
             gp.language = $('select[name=language]').val();
             var args = {
-                gameplay: JSON.stringify(gp),
-                publish: publish
+                content: JSON.stringify(gp),
+                publish: publish,
+                id: gameplay_id
             };
             $.post('/gameplay-as-json/', args)
             .done(function(ngp) {
-                $messages.append(gp.slug ? 'Gameplay updated' : 'Gameplay saved')
-                $def.resolve();
+                $messages.append(gameplay_id ? 'Gameplay updated' : 'Gameplay saved')
+                $def.resolve(ngp);
+                gameplay_id = ngp.id;
             })
             .error(function(e) {
                 $errors.append('Save failed');
@@ -399,11 +401,16 @@ require(['templates', 'route', 'state', 'youtube'],
         function saveInit() {
             $('#draft').on('click', function(e) {
                 var $tab = $('.tab-content.current');
-                $tab.data('save')(saveGameplay, false);
+                $tab.data('save')(saveGameplay, false).done(function(ngp) {
+                    console.log('updated', ngp);
+                });
             });
             $('#publish').on('click', function(e) {
                 var $tab = $('.tab-content.current');
-                $tab.data('save')(saveGameplay, true);
+                $tab.data('save')(saveGameplay, true).done(function(ngp) {
+                    console.log('published', ngp);
+                    location.href = '/your-games/';
+                });
             });
             $(document).on('input', enableSave);
             enableSave();
@@ -430,6 +437,7 @@ require(['templates', 'route', 'state', 'youtube'],
                 if (window.game_init) {
                     var gp = window.game_init,
                         kind = gp.kind;
+                    gameplay_id = gp.ID;
                     $('.tab-link[data-tab=' + kind + ']').click();
                     console.log('loading', gp, kind);
                     $('#' + kind + '.tab-content').data('loadGameplay')(gp)

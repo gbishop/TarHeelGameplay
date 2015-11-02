@@ -300,15 +300,15 @@ function ParseGameplayPost($post) {
         foreach($posttags as $tag)
             $tags[] = $tag->name;
 
-    $res = array('title'=>$title,
-                 'author'=>$author,
-                 'tags'=>$tags);
+    $res = json_decode(get_post_meta($id, 'gamedata', true), true);
+    $res['title'] = $title;
+    $res['author'] = $author;
+    $res['tags'] = $tags;
 
     $res['author_id'] = $author_id;
     $res['status'] = $post->post_status;
 
     $ytid = $res['ytid'] = get_post_meta($id, 'ytid', true);
-    $res['gamedata'] = get_post_meta($id, 'gamedata', true);
     $res['duration'] = get_post_meta($id, 'duration', true);
     if (!$res['duration']) $res['duration'] = '?';
     $res['language'] = get_post_meta($id, 'language', true);
@@ -353,8 +353,8 @@ function SaveGameplayPost($id, $book) {
     }
     $book['ID'] = $id;
 
-    update_post_meta($id, 'ytid', $book['ytid']);
-    update_post_meta($id, 'gamedata', $book['gamedata']);
+    update_post_meta($id, 'ytid', $book['videoId']);
+    update_post_meta($id, 'gamedata', json_encode($book));
     update_post_meta($id, 'duration', $book['duration']);
     update_post_meta($id, 'author_pseudonym', $book['author']);
     update_post_meta($id, 'language', $book['language']);

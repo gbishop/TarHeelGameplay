@@ -44,7 +44,7 @@ if($_SERVER['REQUEST_METHOD'] == 'GET') {
     // posting a new or updated book
     $id = getParam('id', 0, '/\d+/', 'post');
     $publish = getParam('publish', 'false', '/false|true/', 'post');
-    $gamedata = getParam('gameplay', '', null, 'post');
+    $gamedata = getParam('content', '', null, 'post');
     $content = json_decode($gamedata, true);
     // validate user
     if (!is_user_logged_in() || !current_user_can('publish_posts') || ($id && !current_user_can('edit_post', $id))) {
@@ -62,41 +62,33 @@ if($_SERVER['REQUEST_METHOD'] == 'GET') {
     } else {
         $gameplay = array();
     }
+    $gameplay = array_merge($gameplay, $content);
     $canPublish = $publish === 'true';
-    $gameplay['title'] = trim($content['title']);
+    $gameplay['title'] = trim($gameplay['title']);
     $canPublish = $canPublish && strlen($gameplay['title']) > 0;
-    $gameplay['author'] = trim($content['author']);
+    $gameplay['author'] = trim($gameplay['author']);
     $canPublish = $canPublish && strlen($gameplay['author']) > 0;
     // validate audience
-    if (!in_array($content['audience'], array('E', 'C', ' '))) {
+    if (!in_array($gameplay['audience'], array('E', 'C', ' '))) {
         header("HTTP/1.0 400 Bad Audience");
         die();
     }
-    $gameplay['audience'] = $content['audience'];
     // validate reviewed
     //$gameplay['reviewed'] = current_user_can('edit_others_posts') && $content['reviewed'];
 
     // validate language
-    if (!in_array($content['language'], $LangNameToLangCode) && $content['language'] != ' ') {
+    if (!in_array($gameplay['language'], $LangNameToLangCode) && $gameplay['language'] != ' ') {
         header("HTTP/1.0 400 Bad Language");
         die();
     }
-    $gameplay['language'] = $content['language'];
     $canPublish = $canPublish && $gameplay['language'] != ' ';
     // validate tags
-    foreach($content['tags'] as $tag) {
+    foreach($gameplay['tags'] as $tag) {
         if (!term_exists($tag, 'post_tag')) {
             header("HTTP/1.0 400 Bad Tag");
             die();
         }
     }
-    $gameplay['tags'] = $content['tags'];
-    $gameplay['vocabulary'] = $content['vocabulary'];
-    $gameplay['ytid'] = $content['videoId'];
-    $gameplay['gamedata'] = $gamedata;
-    $gameplay['duration'] = $content['duration'];
-    $gameplay['dof'] = $content['dof'];
-    $gameplay['hits'] = $content['hits'];
 
     $gameplay['status'] = $publish && $canPublish ? 'publish' : 'draft';
     $gameplay = SaveGameplayPost($id, $gameplay);
@@ -104,8 +96,6 @@ if($_SERVER['REQUEST_METHOD'] == 'GET') {
         header("HTTP/1.0 400 Save Post Failed");
         die();
     }
-    $id = $gameplay['ID'];
-
     $output = json_encode($gameplay);
     header('Content-Type: application/json');
     header('Content-Size: ' . mb_strlen($output));

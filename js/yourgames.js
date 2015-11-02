@@ -1,9 +1,8 @@
 define([
     'route',
     'state',
-    'controller',
     "jquery.scrollIntoView"
-], function(route, state, controller) {
+], function(route, state) {
 
      $('body').on('PageRendered', '.your-books-page', function() {
         var $this = $(this),
@@ -92,15 +91,16 @@ define([
             action = $this.attr('data-action');
 
         if(action === 'edit') {
-            controller.gotoUrl("/create/?id=" + bookID); // simply change URL, this is all we need to do, right?
+            window.location.href = "/create/?id=" + bookID; // simply change URL, this is all we need to do, right?
         } else if(action === 'delete') {
             $.post('/your-books/', {action: action + '-draft', id: bookID }, function(data, status) {
                // removeFromList(data, status, $li, $li.find('div')); // we can use this for deletion without reload
                window.location.reload(false);  // keep the deletion behavior consistent: refresh page
             }, 'json');
-        } else if(action === 'read') {
+        } else if(action === 'play') {
             state.set('findAnotherLink', '/your-books/');
-            controller.gotoUrl(link, '', { 'data_type': 'book'});
+            window.location.href = link;
+            //controller.gotoUrl(link, '', { 'data_type': 'book'});
         }
     }); // end click
 

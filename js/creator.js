@@ -183,7 +183,7 @@ require(['templates', 'route', 'state', 'youtube'],
                     enablePlay();
                 };
 
-                $tab.data('loadGameplay', function(e, gp) {
+                $tab.data('loadGameplay', function(gp) {
                     $tab.find('input[name=video]').val(gp.videoId);
                     enableLoad();
                     return loadVideo().done(function() {

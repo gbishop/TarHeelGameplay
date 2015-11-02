@@ -25,7 +25,7 @@ if (strpos($accept, 'application/json') !== false ||
     $key = getParam('key', '', null);
     if ($key) {
         $res = get_post_meta(1, $key, true);
-        $output = json_encode($res);
+        $output = $res;
         header('Content-Type: application/json');
         header('Content-Size: ' . mb_strlen($output));
         echo $output;

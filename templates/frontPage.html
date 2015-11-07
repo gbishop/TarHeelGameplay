@@ -31,10 +31,13 @@
                 </select>
                 <input title="_(change language)" class="goButton thr-gray-button" name="go" type="submit" value=" ">
             </form>
-
-            <div class="announcements">
-            </div>
 -->
+            <p><b>_(Latest Announcements)</b></p>
+            <ul>
+            {{#announcements}}
+                <li><a href="{{{link}}}">{{title}}</a></li>
+            {{/announcements}}
+            </ul>
         </div>
     </div>
 </article>

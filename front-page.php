@@ -33,7 +33,7 @@ thr_header('home-page'); ?> <!-- front-page.php -->
 			$content .= get_the_content();
 		}
 	}
-	query_posts("cat=9&posts_per_page=4");
+	query_posts(array('category_name'=>'announcements', 'posts_per_page' => 4));
 	$announcements = array();
 	if (have_posts()) {
 		while (have_posts()) {

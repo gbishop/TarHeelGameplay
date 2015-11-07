@@ -721,4 +721,66 @@ function enqueue_our_required_stylesheets(){
     wp_enqueue_style('open-sans', 'http://fonts.googleapis.com/css?family=Open+Sans');
 }
 add_action('wp_enqueue_scripts','enqueue_our_required_stylesheets');
+
+// modify the registration form
+function my_custom_login_logo() {
+    echo '<style type="text/css">
+    h1 a {background-image:url(/theme/images/apple-touch-icon.png) !important; margin:0 auto;}
+    </style>';
+}
+add_filter( 'login_head', 'my_custom_login_logo' );
+
+// Require the access code
+add_action( 'register_form', 'my_register_form' );
+function my_register_form() {
+    ?>
+    <p>
+        <label for="first_name">First Name<br />
+            <input type="text" name="first_name" id="first_name" class="input" size="25" />
+        </label>
+    </p>
+    <p>
+        <label for="last_name">Last Name<br />
+            <input type="text" name="last_name" id="last_name" class="input" size="25" />
+        </label>
+    </p>
+    <p>
+        <label for="access_code">Registration Code<br />
+            <input type="text" name="access_code" id="access_code" class="input" size="25" />
+        </label>
+    </p>
+    <?php
+}
+
+// Validate the access code
+add_filter( 'registration_errors', 'my_registration_errors', 10, 3 );
+function my_registration_errors( $errors, $sanitized_user_login, $user_email ) {
+
+    if (empty($_POST['access_code']) ||
+        strtolower(trim( $_POST['access_code'] )) != ACCESS_CODE) {
+        $errors->add( 'access_code_error',
+                      '<strong>ERROR</strong>: You must include the access code.');
+    }
+    if (empty($_POST['first_name']) ||
+        trim( $_POST['first_name']) == '') {
+        $errors->add( 'first_name_error',
+                      '<strong>ERROR</strong>: You must include a first name.');
+    }
+    if (empty($_POST['last_name']) ||
+        trim( $_POST['last_name']) == '') {
+        $errors->add( 'last_name_error',
+                      '<strong>ERROR</strong>: You must include a last name.');
+    }
+
+    return $errors;
+}
+add_action( 'user_register', 'my_user_register' );
+function my_user_register( $user_id ) {
+    if (!empty($_POST['first_name'])) {
+        update_user_meta($user_id, 'first_name', trim($_POST['first_name']));
+    }
+    if (!empty($_POST['last_name'])) {
+        update_user_meta($user_id, 'last_name', trim($_POST['last_name']));
+    }
+}
 ?>

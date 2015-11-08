@@ -651,11 +651,12 @@ add_filter('wp_mail_from_name', 'thr_mail_from_name');
 // I suddenly started getting redirect loops when accessing / this seems to fix it.
 remove_filter('template_redirect', 'redirect_canonical');
 
-// exclude books from blog
+// exclude gameplays from blog
 add_action('pre_get_posts', 'thr_modify_query');
 function thr_modify_query( $query ) {
     if (!is_admin() && $query->is_main_query() && !$query->get('cat')) {
-        $query->set('cat', '-3');
+        $gcat = get_cat_ID('Gameplays');
+        $query->set('cat', '-' . $gcat);
     }
 }
 // modify more posts links

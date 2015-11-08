@@ -33,7 +33,7 @@ $args = array(
 
 $posts = get_posts($args);
 $nrows = count($posts);
-$json = 0;
+$json = getParam('json', 0, '/\d+/');
 
 $result = posts_to_find_results($posts, $nrows, $count);
 

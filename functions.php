@@ -490,6 +490,7 @@ function posts_to_find_results($posts, $nrows, $count) {
         $po['thumbnail'] = $g['thumbnail'];
         $po['caution'] = $g['audience'] == 'C';
         $po['hits'] = $g['hits'];
+        $po['duration'] = round($g['duration'] / 60.0);
         $gameplays[] = $po;
     }
 

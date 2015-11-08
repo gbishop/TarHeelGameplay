@@ -434,6 +434,7 @@ require(['templates', 'route', 'state', 'youtube'],
         function creatorInit() {
             youtube.loadApi().done(function() {
                 tabController();
+                saveInit();
                 if (window.game_init) {
                     var gp = window.game_init,
                         kind = gp.kind;
@@ -447,7 +448,7 @@ require(['templates', 'route', 'state', 'youtube'],
                             $('select[name=audience]').val(gp.audience);
                             $('select[name=topic').val(gp.topic);
                             $('select[name=language').val(gp.language);
-                            saveInit();
+                            enableSave();
                         });
                 }
             });

@@ -191,6 +191,10 @@ define(["route", "state", "youtube"], function(route, state, youtube) {
 
     // speak prompt
     function speak(txt) {
+        if (!window.hasOwnProperty('SpeechSynthesisUtterance')) {
+            responsiveVoice.speak(txt, 'US English Female');
+            return;
+        }
         var msg = new SpeechSynthesisUtterance(txt);
         msg.lang = 'en';
         speechSynthesis.speak(msg);

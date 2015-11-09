@@ -20,15 +20,8 @@ if (array_key_exists('favorites', $_GET) && preg_match('/^[AR]/', $_GET['favorit
     die();
 }
 
-// construct the where clause
-$collection = THR('collection');
-if ($collection) {
-    $favorites = $wpdb->get_var($wpdb->prepare("SELECT booklist FROM $collections_table WHERE slug = %s", $collection));
-    setTHR('favorites', $favorites);
-    thr_setcookie(1); // make sure the client sees the updated favorties
-} else {
-    $favorites = THR('favorites');
-}
+
+$favorites = THR('favorites');
 $fav_array = explode(',', $favorites);
 
 $count = 24;

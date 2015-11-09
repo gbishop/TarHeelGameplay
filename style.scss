@@ -535,6 +535,16 @@ h2 {
     border: 4px ridge gray;
     padding: 0.5em;
     width: 80%;
+    margin-bottom: 1em;
+
+    span.button {
+      display: inline-block;
+      @include decoratedButton(1px, #61A0B3, 0.5em, 0, $carolinaBlue, #286DA3, 1em, 0.1em, 1em, #EEE, #81BEF0, #FFF, 0, 4em);
+    }
+
+    span.field {
+      font-weight: bold;
+    }
 }
 
 .error-messages p {

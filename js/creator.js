@@ -46,7 +46,7 @@ require(['templates', 'route', 'state', 'youtube'],
             .done(function(ngp) {
                 $messages.append(gameplay_id ? 'Gameplay updated' : 'Gameplay saved')
                 $def.resolve(ngp);
-                gameplay_id = ngp.id;
+                gameplay_id = ngp.ID;
             })
             .error(function(e) {
                 $errors.append('Save failed');

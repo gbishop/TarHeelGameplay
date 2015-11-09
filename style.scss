@@ -525,14 +525,16 @@ h2 {
 .prev-posts {}
 
 .help {
-    width: 2em;
-    height: 2em;
     float: right;
     cursor: pointer;
 }
 
 .help-text {
     display: none;
+    background: white;
+    border: 4px ridge gray;
+    padding: 0.5em;
+    width: 80%;
 }
 
 .error-messages p {

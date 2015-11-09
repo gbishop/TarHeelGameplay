@@ -2,17 +2,8 @@
 <p>_(You must have Javascript enabled in order use this page.)</p>
 </noscript>
 {{#user}}
-   <div class="quickNavigation">
-        <img class="help" src="/theme/images/help.png" title="_(Click for help)" alt="_(Click for help)"/>
-        <p class="help-text" title="_(Quick Navigation)">_(Links to the main sections of this page are listed below. You may choose to use these links to help you get to the different sections of this page.)</p>
-        <h2>_(Quick Navigation)</h2>
-        <ul>
-            <li class="draftBooksHeaderLink">_(Your Draft Gameplays)</li>
-            <li class="publishedBooksHeaderLink">_(Your Published Gameplays)</li>
-        </ul>
-   </div>
    <div class="container">
-        <img class="help" src="/theme/images/help.png" title="_(Click for help)" alt="_(Click for help)"/>
+        <i class="fa fa-question-circle help" title="_(Click for help)"></i>
         <p class="help-text" title="_(Your Draft Gameplays)">_(Your draft Gameplays are listed below. Click on a title to expose a menu that will allow you to edit or delete it.)</p>
         <h2 class="draftBooksHeader">_(Your Draft Gameplays)</h2>
         {{#has_drafts}}
@@ -36,7 +27,7 @@
    </div>
 
     <div id="container">
-        <img class="help" src="/theme/images/help.png" title="_(Click for help)" alt="_(Click for help)"/>
+        <i class="fa fa-question-circle help" title="_(Click for help)"></i>
         <p class="help-text" title="_(Your Published Gameplays)">_(Your published Gameplays are listed below. Click on a title to expose a menu that will allow you to edit it. From the editor you may return a gameplay to draft status by clicking Save as Draft.)</p>
         <h2 class="publishedBooksHeader">_(Your Published Gameplays)</h2>
         {{#has_published}}

@@ -9,6 +9,10 @@
         <p>On this tab you can quickly create a basic interactive gameplay with a fixed interval between prompts.</p>
 
         <form id="basic-gameplay">
+            <i class="fa fa-question-circle help" title="_(Click for help)"></i>
+            <p class="help-text">
+                Find a video you like on YouTube and copy the URL for the video from the URL bar of your browser. Then paste that URL into the box below and click the "Load" button.
+            </p>
             <label>YouTube Video ID (or URL)
                 <input type="text" name="video" value="{{videoId}}" required
                        pattern="[a-zA-Z0-9_-]{11}" />
@@ -17,6 +21,11 @@
             <div class="player-container">
                 <div class="player"></div>
             </div>
+            <i class="fa fa-question-circle help" title="_(Click for help)"></i>
+            <p class="help-text">
+                Enter the number of seconds you want the video to play between pauses into the "Pause every" field. Enter the prompt message in the "Prompt" field. You may optionally adjust the start and end time by clicking in the field and either typing a number or by using the up and down arrow keys. Pressing up arrow will increase the time by 0.1 seconds, holding shift while pressing it will increase the time by 1 second. The video will advance as you adjust the time so that you can get it to just the right place.
+            </p>
+
             <label>Pause every:
                 <input type="number" name="interval" min="5" placeholder="Seconds"
                     title="Time in seconds between pauses."
@@ -35,23 +44,44 @@
                 <input type="number" name="end" min="0" step="0.1" placeholder="seconds"
                     value="{{end}}" required />
             </label>
-            <button class="play" class="thr-blue-button" type="button" disabled>Play</button>
+            <br />
+            <i class="fa fa-question-circle help" title="_(Click for help)"></i>
+            <p class="help-text">
+                Pressing the Play button will open a new browser window where you can try your gameplay. You may share your newly created game with anyone simply by copying the URL from that window and sharing it with others. No one without the URL will be able to see it.
+            </p>
+
+            <button class="play thr-blue-button" type="button" disabled>Play</button>
         </form>
     </div>
     <div id="precise" class="tab-content">
         <p>On this tab you may create a Gameplay where you control the time and text for each prompt.</p>
         <div class="formlike">
+            <i class="fa fa-question-circle help" title="_(Click for help)"></i>
+            <p class="help-text">
+                Find a video you like on YouTube and copy the URL for the video from the URL bar of your browser. Then paste that URL into the box below and click the "Load" button.
+            </p>
+
             <label>YouTube Video ID (or URL)
                 <input type="text" name="video" value="" required pattern="[a-zA-Z0-9_-]{11}" />
             </label>
             <button class="loadVideo" disabled>Load</button>
             <div class="player-container">
                 <div class="player"></div>
+                <i class="fa fa-question-circle help" title="_(Click for help)"></i>
+                <p class="help-text">
+                    Once your video is loaded a box will appear below with the label "Start at". You may click in the box and type a time, or better yet, use the up and down arrow keys to adjust the start time of your video. Hold the shift key to make adjustments in 1 second steps.<br/>
+                    Now, click the play arrow inside the YouTube video window to start the video playing. As it plays, click the "Add a Pause" button to add a pause point to your gameplay whenever you want. When the video is finished you can go back and fill in the "Prompt" text for each pause.<br/>
+                    You will also be able to adjust the times using the arrow keys so don't worry about getting them in exactly the right places on the first play through.
+                </p>
                 <button class="add-pause thr-blue-button" disabled>Add A Pause</button>
                 <ul class="timepoints">
                 </ul>
 
             </div>
+            <i class="fa fa-question-circle help" title="_(Click for help)"></i>
+            <p class="help-text">
+                Pressing the Play button will open a new browser window where you can try your gameplay. You may share your newly created game with anyone simply by copying the URL from that window and sharing it with others. No one without the URL will be able to see it.
+            </p>
             <button class="play thr-blue-button" disabled>Play</button>
 
         </div>
@@ -60,17 +90,31 @@
     <div id="advanced" class="tab-content">
         <p>On this tab you may create a Gameplay multiple prompts at each time.</p>
         <div class="formlike">
+            <i class="fa fa-question-circle help" title="_(Click for help)"></i>
+            <p class="help-text">
+                Find a video you like on YouTube and copy the URL for the video from the URL bar of your browser. Then paste that URL into the box below and click the "Load" button.
+            </p>
             <label>YouTube Video ID (or URL)
                 <input type="text" name="video" value="" required pattern="[a-zA-Z0-9_-]{11}" />
             </label>
             <button class="loadVideo" disabled>Load</button>
             <div class="player-container">
                 <div class="player"></div>
+                <i class="fa fa-question-circle help" title="_(Click for help)"></i>
+                <p class="help-text">
+                    Once your video is loaded a box will appear below with the label "Start at". You may click in the box and type a time, or better yet, use the up and down arrow keys to adjust the start time of your video. Hold the shift key to make adjustments in 1 second steps.<br/>
+                    Now, click the play arrow inside the YouTube video window to start the video playing. As it plays, click the "Add a Pause" button to add a pause point to your gameplay whenever you want. When the video is finished you can go back and fill in the "Choice" text for each pause. You may also adjust the action to go with the users choice using the "Action" box.<br/>
+                    You can add additional choices at any of the pause points by clicking the little <i class="fa fa-plus-square"></i> button in the Choice box. This way you can present a player with multiple choices that result in either continuing, starting over, quitting, or jumping to a new point in the video. If you choose to jump to a new time, you can click in the box that appears to the right of the "Jump to" label and again use your arrow keys to adjust the time.
+                </p>
                 <button class="add-pause thr-blue-button" disabled>Add A Pause</button>
                 <ul class="timepoints">
                 </ul>
 
             </div>
+            <i class="fa fa-question-circle help" title="_(Click for help)"></i>
+            <p class="help-text">
+                Pressing the Play button will open a new browser window where you can try your gameplay. You may share your newly created game with anyone simply by copying the URL from that window and sharing it with others. No one without the URL will be able to see it.
+            </p>
             <button class="play thr-blue-button" disabled>Play</button>
 
         </div>

@@ -117,17 +117,26 @@ require(['templates', 'route', 'state', 'youtube'],
                     value = Math.min(duration, Math.max(0, value + sign * step));
                     value = Math.round(value * 10) / 10;
                     $target.val(value.toFixed(1));
-                    if (player) player.seekTo(value);
+                    if (player) {
+                        player.stopVideo();
+                        player.seekTo(value);
+                    }
                 } else if (evt.keyCode == 13) { // return
                     var $target = $(evt.target),
                         value = parseFloat($target.val());
-                    player.seekTo(value);
+                    if (player) {
+                        player.stopVideo();
+                        player.seekTo(value);
+                    }
                 }
 
             }).on('focus', "input[type='number'][step]", function(evt) {
                 var $target = $(evt.target),
                     value = parseFloat($target.val());
-                if (player) player.seekTo(value);
+                if (player) {
+                    player.stopVideo();
+                    player.seekTo(value);
+                }
                 return true;
             });
 

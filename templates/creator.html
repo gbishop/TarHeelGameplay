@@ -129,9 +129,14 @@
     </div>
 
     {{#loggedin}}
-        <i class="fa fa-question-circle help" title="_(Click for help)"></i>
-        <p class="help-text">You can play and share your gameplay by clicking the <span class="button">Play</span> button above to open a new window. If you copy and share the URL of that window, anyone may enjoy your gameplay. You may also share your gameplay on our site by submitting the following form.</p>
         <h2>Save your Gameplay</h2>
+        <i class="fa fa-question-circle help" title="_(Click for help)"></i>
+        <ul class="help-text">
+            <li>You can play and share your gameplay by clicking the <span class="button">Play</span> button above to open a new window. If you copy and share the URL of that window, anyone may enjoy your gameplay.</li>
+            <li>You may also share your gameplay on our site by submitting the following form.</li>
+            <li>Click the <span class="button">Draft</span> button to save your gameplay as a draft or to revert a previously published gameplay to draft status. Draft games are not included in the list available to everyone.</li>
+            <li>Click the <span class="button">Publish</span> button to publish your gameplay on the site so that everyone can enjoy it.
+        </ul>
         <form id="save-gameplay">
             <label>Title
                 <input type="text" name="title" placeholder="Title for your gameplay" required />
@@ -162,9 +167,9 @@
             </label>
             <div id="errors"></div>
             <div id="messages"></div>
-            <button type="button" id="draft" type="submit" class="thr-blue-button">
+            <button type="button" id="draft" type="button" class="thr-blue-button">
                 Draft</button>
-            <button type="button" id="publish" type="submit" class="thr-blue-button">
+            <button type="button" id="publish" type="button" class="thr-blue-button">
                 Publish</button>
         </form>
     {{/loggedin}}

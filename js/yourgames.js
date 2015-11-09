@@ -93,12 +93,12 @@ define([
         if(action === 'edit') {
             window.location.href = "/create/?id=" + bookID; // simply change URL, this is all we need to do, right?
         } else if(action === 'delete') {
-            $.post('/your-books/', {action: action + '-draft', id: bookID }, function(data, status) {
+            $.post('/your-games/', {action: action + '-draft', id: bookID }, function(data, status) {
                // removeFromList(data, status, $li, $li.find('div')); // we can use this for deletion without reload
                window.location.reload(false);  // keep the deletion behavior consistent: refresh page
             }, 'json');
         } else if(action === 'play') {
-            state.set('findAnotherLink', '/your-books/');
+            state.set('findAnotherLink', '/your-games/');
             window.location.href = link;
             //controller.gotoUrl(link, '', { 'data_type': 'book'});
         }

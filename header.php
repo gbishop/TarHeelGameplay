@@ -31,6 +31,7 @@
         if (!window.console.log) window.console.log = function () { };
     </script>
     <script data-main="/theme/js/main" src="/theme/js/require.min.js"></script>
+    <script src="http://code.responsivevoice.org/responsivevoice.js"></script>
     <?php wp_head(); ?>
 
     <script>

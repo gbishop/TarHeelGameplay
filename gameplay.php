@@ -7,7 +7,7 @@ Play a game
 ?>
 <?php
 
-define('GPS_DB_VERSION', '1.0.1');
+define('GPS_DB_VERSION', '1.0');
 
 function gps_install() {
     global $wpdb;
@@ -34,6 +34,7 @@ function gps_install() {
     $metas = get_post_meta(1);
     foreach($metas as $key=>$json) {
         if (strpos($key, '_') === 0) continue;
+        if (gps_get_json($key)) continue;
         $wpdb->insert(
             $table_name,
             array(

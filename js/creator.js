@@ -118,14 +118,14 @@ require(['templates', 'route', 'state', 'youtube'],
                     value = Math.round(value * 10) / 10;
                     $target.val(value.toFixed(1));
                     if (player) {
-                        player.stopVideo();
+                        player.pauseVideo();
                         player.seekTo(value);
                     }
                 } else if (evt.keyCode == 13) { // return
                     var $target = $(evt.target),
                         value = parseFloat($target.val());
                     if (player) {
-                        player.stopVideo();
+                        player.pauseVideo();
                         player.seekTo(value);
                     }
                 }
@@ -134,7 +134,7 @@ require(['templates', 'route', 'state', 'youtube'],
                 var $target = $(evt.target),
                     value = parseFloat($target.val());
                 if (player) {
-                    player.stopVideo();
+                    player.pauseVideo();
                     player.seekTo(value);
                 }
                 return true;

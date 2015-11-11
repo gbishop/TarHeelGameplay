@@ -100,10 +100,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
     // posting a new or updated book
     global $log;
     $json = getParam('gp', '', null, 'post');
-    /*
-    $name = hash('crc32', $json, false);
-    update_post_meta(1, $name, $json);
-    */
     $name = gps_get_key($json);
     $res = array('name'=>$name);
     $output = json_encode($res);
@@ -117,9 +113,6 @@ if (strpos($accept, 'application/json') !== false ||
     strpos($accept, 'text/javascript') !== false) {
     $key = getParam('key', '', null);
     if ($key) {
-        /*
-        $res = get_post_meta(1, $key, true);
-        */
         $res = gps_get_json($key);
         $output = $res;
         header('Content-Type: application/json');
@@ -134,9 +127,6 @@ $key = getParam('key', '', null);
 $id = getParam('id', '', null);
 $script = "";
 if ($key) {
-    /*
-    $json = get_post_meta(1, $key, true);
-    */
     $json = gps_get_json($key);
     $script = "<script>window.game_init=$json; </script>";
 } elseif($id) {

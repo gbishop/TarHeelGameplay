@@ -7,12 +7,11 @@ define([ "route",
          "templates",
          "state",
          "keyboard",
-         "speech",
          "page",
          "ios",
          "store",
          "jquery.scrollIntoView"
-        ], function(route, controller, templates, state, keys, speech, page, ios, store) {
+        ], function(route, controller, templates, state, keys, page, ios, store) {
 
     // return the url that will restore the find page state
     function find_url(page) {
@@ -103,16 +102,6 @@ define([ "route",
             selected.removeClass('selected');
         }
         toSelect.addClass('selected');
-        // speak the title
-        if (toSelect.attr('data-speech')) {
-            speech.play('site', toSelect.attr('data-speech'), state.get('locale'));
-        } else {
-            var id = toSelect.attr('data-id'),
-                bust = toSelect.attr('data-bust'),
-                lang = toSelect.attr('lang'),
-                text = toSelect.find('h2').text();
-            speech.play(id, 1, lang, text, bust);
-        }
         // make sure it is visible
         toSelect.scrollIntoView({
             duration: 100,

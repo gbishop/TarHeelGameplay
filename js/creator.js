@@ -269,14 +269,6 @@ require(['templates', 'route', 'state', 'youtube'],
                     enablePlay();
                 }
 
-                function deleteTimepoint() {
-                    if (!$selectedTimepoint) {
-                        return;
-                    }
-                    $selectedTimepoint.remove();
-                    setSelectedTimepoint(null);
-                }
-
                 function unique(array){
                     return array.filter(function(el, index, arr) {
                         return index === arr.indexOf(el);
@@ -353,9 +345,11 @@ require(['templates', 'route', 'state', 'youtube'],
                 $tab.find('.timepoints')
                 .on('click', 'button.delete-pause', function(e) {
                     $(e.currentTarget).closest('li').remove();
+                    enablePlay();
                 })
                 .on('click', 'button.delete-choice', function(e) {
                     $(e.currentTarget).closest('li').remove();
+                    enablePlay();
                 })
                 .on('click', 'button.add-choice', function(e) {
                     var $t = $(e.currentTarget),
@@ -365,11 +359,13 @@ require(['templates', 'route', 'state', 'youtube'],
                         next: 0
                     }, tnow);
                     $(e.currentTarget).closest('ol').append(n);
+                    enablePlay();
                 })
                 .on('change', 'select[name=action]', function(e) {
                     var $s = $(e.target),
                         sv = $s.find(":selected").val();
                     $s.siblings('input[name=target]').toggle(sv == 'jump');
+                    enablePlay();
                 })
                 .on('input', 'input', enablePlay);
                 enablePlay();

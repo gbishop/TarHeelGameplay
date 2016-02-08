@@ -1,4 +1,4 @@
-define(['jquery.ui.touch-punch'], function() {
+define([], function() {
     $(function() {
         $(document).on('click', '.help,.help-text', function(e) {
             var $this = $(this);

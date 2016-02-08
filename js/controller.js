@@ -3,9 +3,8 @@ define([  "route",
           "page",
           "state",
           "templates",
-          "ios",
           "history.adapter.jquery"
-         ], function(route, page, state, templates, ios) {
+         ], function(route, page, state, templates) {
 
     var History = window.History,
         document = window.document,
@@ -93,8 +92,6 @@ define([  "route",
             url = hist.url,
             bar = window.location.href,
             context = hist.data;
-
-        ios.setLastUrl(url);
 
         //console.log("State changed...", url, context);
         if (url != bar && bar.indexOf('#') > -1) {

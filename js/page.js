@@ -1,6 +1,6 @@
 /* page.js manage multiple pages in the DOM */
 
-define(["state", "ios"], function(state, ios) {
+define(["state"], function(state) {
 
     // find or create an inactive page of the indicated type
     function getInactive(type) {
@@ -24,7 +24,6 @@ define(["state", "ios"], function(state, ios) {
         $oldpage.remove();
         $page.css('display', 'block').addClass('active-page');
         $page.attr('aria-hidden', 'false');
-        ios.focusMenu($page);
         var title = options.title || $page.attr('data-title');
         $def.resolve($page, title);
         return $def;

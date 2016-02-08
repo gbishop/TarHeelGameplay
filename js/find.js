@@ -8,10 +8,9 @@ define([ "route",
          "state",
          "keyboard",
          "page",
-         "ios",
          "store",
          "jquery.scrollIntoView"
-        ], function(route, controller, templates, state, keys, page, ios, store) {
+        ], function(route, controller, templates, state, keys, page, store) {
 
     // return the url that will restore the find page state
     function find_url(page) {
@@ -231,10 +230,6 @@ define([ "route",
         '.find-page .thr-favorites-icon, .favorites-page .thr-favorites-icon',
         function(ev) {
             //console.log('click favorites icon');
-            if (ios.cancelNav(ev)) {
-                // avoid ios double click bug
-                return false;
-            }
             $('.active-page').toggleClass('chooseFavorites');
             ev.preventDefault();
     });

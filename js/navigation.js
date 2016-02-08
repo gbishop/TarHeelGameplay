@@ -1,5 +1,5 @@
 // Code for navigation and settings menus
-define(["state", "controller", "templates", "ios"], function(state, controller, templates, ios) {
+define(["state", "controller", "templates"], function(state, controller, templates) {
     // list of settings
     var settings = ["voice", "pageColor", "textColor"], // the settings that we are concerned with (voice = speech)
         options = { // list of available options
@@ -81,9 +81,6 @@ define(["state", "controller", "templates", "ios"], function(state, controller, 
                 $navigation = $contentWrap.find(".navigationMenu"),
                 $hiddenContent = $contentWrap.find(".hiddenContent");
 
-            if (ios.cancelNav(ev)) {
-                return false;
-            }
             //console.log(1);
             if($navigation.length === 0) { // nav doesn't exist, load it
                 templates.setLocale().then(function() {
@@ -132,9 +129,6 @@ define(["state", "controller", "templates", "ios"], function(state, controller, 
          * Begin Settings Code
          */
         $body.on("click", ".thr-settings-icon", function(ev, data) {
-            if (ios.cancelNav(ev)) {
-                return false;
-            }
 
             updateCheckedOptions(); // update currently selected setting options marked with a check accordingly
             $(".active-page .submenu, .active-page .innerSubmenu").hide();

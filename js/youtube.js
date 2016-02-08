@@ -1,4 +1,4 @@
-define([], function() {
+define(['ios'], function(ios) {
     function loadApi() {
         var $def = $.Deferred();
         window.onYouTubeIframeAPIReady = function () {
@@ -18,8 +18,9 @@ define([], function() {
                 },
                 events: {
                     onReady: function() {
-                        if (pauseOnPlay)
+                        if (pauseOnPlay && !ios.isIOS()) {
                             player.playVideo();
+                        }
                     },
                     onStateChange: function(event) {
                         if (pauseOnPlay && event.data == YT.PlayerState.PLAYING) {

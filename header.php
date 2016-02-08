@@ -20,13 +20,13 @@
         echo template_render('styleColor', $view);
 
         if (THR('debug')) {
-            echo '    <script src="http://152.2.129.207:8008/target/target-script-min.js#anonymous"></script>';
+            echo '    <script src="http://152.2.129.207:8080/target/target-script-min.js#anonymous"></script>';
         }
     ?>
     <script src="/theme/js/modernizr.custom.js"></script>
     <script src="//code.jquery.com/jquery-2.1.1.min.js"></script>
     <script>
-        var require = { waitSeconds: 200 };
+        //var require = { waitSeconds: 200 };
         if (!window.console) window.console = {};
         if (!window.console.log) window.console.log = function () { };
     </script>

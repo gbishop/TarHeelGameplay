@@ -12,9 +12,10 @@
 	);
     $key = getParam('key', '', null);
     $id = getParam('id', '', null);
+    echo "<!-- $key $id -->";
     $script = "";
     if ($key) {
-        $json = get_post_meta(1, $key, true);
+        $json = gps_get_json($key);
         $script = "<script>window.game_init=$json; </script>";
     } elseif($id) {
         $post = get_post($id);

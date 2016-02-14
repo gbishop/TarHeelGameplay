@@ -785,4 +785,95 @@ function my_user_register( $user_id ) {
         update_user_meta($user_id, 'last_name', trim($_POST['last_name']));
     }
 }
+
+define('GPS_DB_VERSION', '1.0');
+
+function gps_install() {
+    global $wpdb;
+
+    $table_name = $wpdb->prefix . 'gameplaystore';
+
+    $charset_collate = $wpdb->get_charset_collate();
+
+    $sql = "CREATE TABLE $table_name (
+        id mediumint(9) NOT NULL AUTO_INCREMENT,
+        time datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
+        hash varchar(32) NOT NULL,
+        json text NOT NULL,
+        UNIQUE KEY id (id),
+        UNIQUE KEY hash (hash)
+    ) $charset_collate;";
+
+    require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+    dbDelta( $sql );
+
+    update_option( 'gps_db_version', GPS_DB_VERSION );
+
+    // copy over data from old meta values
+    $metas = get_post_meta(1);
+    foreach($metas as $key=>$json) {
+        if (strpos($key, '_') === 0) continue;
+        if (gps_get_json($key)) continue;
+        $wpdb->insert(
+            $table_name,
+            array(
+                'time' => current_time('mysql'),
+                'hash' => $key,
+                'json' => $json[0]
+            )
+        );
+    }
+}
+
+$installed_ver = get_option( "gps_db_version" );
+if( $installed_ver !== GPS_DB_VERSION ) {
+    gps_install();
+}
+
+function gps_get_key($json) {
+    require_once 'mn_words.php';
+    global $mnemonicode_words;
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'gameplaystore';
+    $base = count($mnemonicode_words);
+
+    $tohash = $json;
+    while(true) {
+        $num = hexdec(hash('crc32', $tohash, false));
+        $key = [];
+        for($i = 0; $i < 3; ++$i) {
+            $n = $num % $base;
+            $num = (int)($num / $base);
+            $key[] = $mnemonicode_words[$n];
+        }
+        $key = join('-', $key);
+        $val = gps_get_json($key);
+        if (!$val) {
+            $wpdb->insert(
+                $table_name,
+                array(
+                    'time' => current_time('mysql'),
+                    'hash' => $key,
+                    'json' => $json
+                )
+            );
+            return $key;
+        }
+        if ($val === $json) {
+            return $key;
+        }
+        $tohash = $tohash . ' '; // pad it to change the hash
+    }
+}
+
+function gps_get_json($key) {
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'gameplaystore';
+
+    $val = $wpdb->get_var($wpdb->prepare("select json from $table_name where hash = %s",
+        $key));
+    return $val;
+}
+
+
 ?>

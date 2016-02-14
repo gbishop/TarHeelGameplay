@@ -42,7 +42,7 @@ copyproduction:
 optimized: build
 	rm -rf ../Theme-build/*
 	nodejs ../r.js -o js/app.build.js
-	cp --parents -r *.php *.json js/main-combined.js js/json2.min.js js/modernizr.custom.js js/require.min.js *.png images style.css Makefile ../Theme-build
+	cp --parents -r *.php *.json js/main-combined.js js/modernizr.custom.js js/require.min.js *.png images style.css Makefile ../Theme-build
 	mv ../Theme-build/js/main-combined.js ../Theme-build/js/main.js
 	make versioned
 	python tools/manifest.py ../Theme-build/used.txt > ../Theme-build/manifest.appcache

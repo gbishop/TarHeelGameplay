@@ -354,18 +354,13 @@ function SaveGameplayPost($id, $book) {
     $book['ID'] = $id;
 
     update_post_meta($id, 'ytid', $book['videoId']);
-    update_post_meta($id, 'gamedata', json_encode($book));
+    update_post_meta($id, 'gamedata', wp_slash(json_encode($book)));
     update_post_meta($id, 'duration', $book['duration']);
     update_post_meta($id, 'author_pseudonym', $book['author']);
     update_post_meta($id, 'language', $book['language']);
     update_post_meta($id, 'audience', $book['audience']);
     update_post_meta($id, 'dof', $book['dof']);
     update_post_meta($id, 'hits', $book['hits']);
-
-    $log->logError(print_r($id, true));
-    $post = get_post($id);
-    $log->logError(print_r($post, true));
-    $book = ParseGameplayPost($post);
 
     return $book;
 }

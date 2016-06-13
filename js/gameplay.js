@@ -239,6 +239,8 @@ define(["route", "state", "youtube"], function(route, state, youtube) {
             //height: $("iframe").height(),
             lineHeight: $("iframe").height() + 'px'
         }).fadeIn(200);
+        document.body.tabIndex = 1;
+        document.body.focus();
         speak(choices[0].prompt);
     }
 

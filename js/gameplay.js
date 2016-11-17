@@ -225,9 +225,13 @@ define(["route", "state", "youtube"], function(route, state, youtube) {
         if (!tp) tp = nextTimePoint;
         var choices = tp.choices,
             $message = $('#message').empty();
-        shuffle(choices);
+        console.log('randomize', state.get('randomize'));
+        if (state.get('randomize') == '1') {
+            console.log('randomize');
+            shuffle(choices);
+        }
         for (var i=0; i < choices.length; i++) {
-            var $tr = $('<tr><td>' + choices[i].prompt + '</td></tr>');
+            var $tr = $('<tr><td><a href="#">' + choices[i].prompt + '</a></td></tr>');
             $tr.data('next', choices[i].next);
             if (i === 0) {
                 $tr.addClass('selected');
@@ -273,6 +277,7 @@ define(["route", "state", "youtube"], function(route, state, youtube) {
         // click or touch right on the prompt
         $(document).on('click touchstart', 'tr', function(evt) {
             evt.stopPropagation();
+            evt.preventDefault();
             var $tr = $(this);
             doResponse($tr);
         });
@@ -351,4 +356,6 @@ define(["route", "state", "youtube"], function(route, state, youtube) {
 
     route.add('init', /^\/play\/.*/, init);
     route.add('init', /^\/\d+\/\d+\/\d+\/([^\/]+)\/(?:(\d+)\/)?(?:\?.*)?$/, init);
+
+    return { speak: speak }
 });

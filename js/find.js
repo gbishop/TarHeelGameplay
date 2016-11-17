@@ -9,8 +9,9 @@ define([ "route",
          "keyboard",
          "page",
          "store",
+         "gameplay",
          "jquery.scrollIntoView"
-        ], function(route, controller, templates, state, keys, page, store) {
+        ], function(route, controller, templates, state, keys, page, store, gameplay) {
 
     // return the url that will restore the find page state
     function find_url(page) {
@@ -101,6 +102,13 @@ define([ "route",
             selected.removeClass('selected');
         }
         toSelect.addClass('selected');
+        // speak the title
+        if (toSelect.attr('data-speech')) {
+            gameplay.speak(toSelect.text());
+        } else {
+            var text = toSelect.find('h2').text();
+            gameplay.speak(text);
+        }
         // make sure it is visible
         toSelect.scrollIntoView({
             duration: 100,

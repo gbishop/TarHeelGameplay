@@ -781,6 +781,13 @@ function my_user_register( $user_id ) {
     }
 }
 
+// fix the registration email by removing <> around url
+add_filter('retrieve_password_message', 'my_password_message', 10, 4);
+function my_password_message($message, $key) {
+    $message = preg_replace('/<([^>]+)>/', "$1", $message);
+    return $message;
+}
+
 define('GPS_DB_VERSION', '1.0');
 
 function gps_install() {

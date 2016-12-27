@@ -18,6 +18,15 @@ if (THR('audience'))
     $mq[] = array(
         'key' => 'audience',
         'value' => THR('audience'));
+
+if (THR('skill') > 0) {
+    $skill = THR('skill');
+    $mq[] = array(
+        'key' => 'dof',
+        'value' => $skill,
+        'compare' => ($skill < 2) ? '=' : '>=');
+}
+
 $args = array(
     's'                => THR('search'),
     'posts_per_page'   => $cp1,

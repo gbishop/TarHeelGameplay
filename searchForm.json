@@ -23,6 +23,15 @@
                 { "label": "_(Any rating|selection to ignore the audience rating)", "value": "" }
             ]
         },
+        {   "label": "_(Skill|pulldown label for skill level)",
+            "name": "skill",
+            "select": true,
+            "options": [
+                { "label": "_(Any skill|selection to ignore skill level)", "value": "0" },
+                { "label": "_(Cause/Effect|only one choice, hit any key)", "value": "1" },
+                { "label": "_(Multiple choice|requires switch selection)", "value": "2" }
+            ]
+        },
         {   "label": "_(Language)",
             "name": "language",
             "select": true,

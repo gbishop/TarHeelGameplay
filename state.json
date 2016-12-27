@@ -3,6 +3,7 @@
     "category": { "pattern": "^([-A-Za-z]+)?$", "default": "" },
     "type": { "pattern": "^[TCO]?$", "default": "" },
     "audience": { "pattern": "^[CE]?$", "default": "E" },
+    "skill": { "pattern": "^\\d+$", "default": "0" },
     "search": { "pattern": "", "default": "" },
     "pageColor": { "pattern": "^[f0]{3}$", "default": "fff" },
     "textColor": { "pattern": "^[f0]{3}$", "default": "000" },

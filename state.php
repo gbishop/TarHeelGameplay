@@ -111,7 +111,7 @@ function setTHR($p, $v) {
 function find_url($page = null) {
     global $THRState;
     $p = array();
-    foreach(array('search', 'category', 'audience', 'language') as $parm) {
+    foreach(array('search', 'category', 'audience', 'skill', 'language') as $parm) {
         $v = urlencode($THRState[$parm]);
         $p[] = "$parm=$v";
     }
@@ -130,7 +130,7 @@ function find_url($page = null) {
 function favorites_url($fpage = null) {
     global $THRState;
     $p = array();
-    $parms = array('pageColor', 'textColor', 'voice');
+    $parms = array('randomize');
     if ($THRState['collection']) {
         $parms[] = 'collection';
     } else {

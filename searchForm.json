@@ -28,8 +28,8 @@
             "select": true,
             "options": [
                 { "label": "_(Any skill|selection to ignore skill level)", "value": "0" },
-                { "label": "_(Cause/Effect|only one choice, hit any key)", "value": "1" },
-                { "label": "_(Multiple choice|requires switch selection)", "value": "2" }
+                { "label": "_(Cause/effect|only one choice, hit any key)", "value": "1" },
+                { "label": "_(Choice making|requires switch selection)", "value": "2" }
             ]
         },
         {   "label": "_(Language)",

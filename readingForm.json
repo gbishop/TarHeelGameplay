@@ -8,6 +8,22 @@
                 { "label": "_(Off)", "value": "0" }
             ]
         },
+        {   "label": "_(Move prompts)",
+            "name": "moveprompts",
+            "select": true,
+            "options": [
+                { "label": "_(On)", "value": "1" },
+                { "label": "_(Off)", "value": "0" }
+            ]
+        },
+        {   "label": "_(Speech)",
+            "name": "speech",
+            "select": true,
+            "options": [
+                { "label": "_(On)", "value": "1" },
+                { "label": "_(Off)", "value": "0" }
+            ]
+        },
         {   "input": true,
             "type": "submit",
             "value": "_(Done|button label)"

@@ -224,7 +224,23 @@ define(["route", "state", "youtube"], function(route, state, youtube) {
     function showPrompt(tp) {
         if (!tp) tp = nextTimePoint;
         var choices = tp.choices,
-            $message = $('#message').empty();
+            $message = $('#message').empty(),
+            style = '';
+        if (state.get('moveprompts') == '1') {
+            var quad = Math.floor(Math.random() * 4);
+            style = 'position:absolute;';
+            if (quad & 1) {
+                style = style + 'right:0;';
+            } else {
+                style = style + 'left:0;';
+            }
+            if (quad & 2) {
+                style = style + 'top:0;';
+            } else {
+                style = style + 'bottom:0;';
+            }
+        }
+        $message.attr('style', style);
         console.log('randomize', state.get('randomize'));
         if (state.get('randomize') == '1') {
             console.log('randomize');
@@ -245,7 +261,9 @@ define(["route", "state", "youtube"], function(route, state, youtube) {
         }).fadeIn(200);
         document.body.tabIndex = 1;
         document.body.focus();
-        speak(choices[0].prompt);
+        if (state.get('speech') == '1') {
+            speak(choices[0].prompt);
+        }
     }
 
     // handle user response
@@ -334,7 +352,9 @@ define(["route", "state", "youtube"], function(route, state, youtube) {
                 }
                 $selected = $choices.eq(n);
                 $selected.addClass('selected');
-                speak($selected.text());
+                if (state.get('speech') == '1') {
+                    speak($selected.text());
+                }
 
             } else if(choosers.indexOf(evt.keyCode) >= 0) {
                 // chooser

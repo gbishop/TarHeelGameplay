@@ -15,5 +15,7 @@
     "findAnotherLink": { "pattern": "", "default": "/find/" },
     "debug": { "pattern": "^[01]$", "default": "0" },
     "escape": { "pattern": "^[01]$", "default": "0" },
-    "randomize": { "pattern": "^[01]$", "default": "1" }
+    "randomize": { "pattern": "^[01]$", "default": "1" },
+    "moveprompts": { "pattern": "^[01]$", "default": "0" },
+    "speech": { "pattern": "^[01]$", "default": "1" }
 }

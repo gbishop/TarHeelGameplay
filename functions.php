@@ -321,9 +321,9 @@ function ParseGameplayPost($post) {
     $res['modified'] = $post->post_modified;
     $res['created'] = $post->post_date;
     $res['slug'] = $post->post_name;
-    $res['link'] = preg_replace('/http:\/\/[a-zA-Z0-9.]+/', '', get_permalink($id));
-    $res['preview'] = "http://img.youtube.com/vi/$ytid/hqdefault.jpg";
-    $res['thumbnail'] = "http://img.youtube.com/vi/$ytid/mqdefault.jpg";
+    $res['link'] = preg_replace('/https?:\/\/[a-zA-Z0-9.]+/', '', get_permalink($id));
+    $res['preview'] = "https://img.youtube.com/vi/$ytid/hqdefault.jpg";
+    $res['thumbnail'] = "https://img.youtube.com/vi/$ytid/mqdefault.jpg";
     $res['ID'] = $id;
     $res['bust'] = mysql2date('ydmHis', $post->post_modified, false);  // cache bust for speech
 

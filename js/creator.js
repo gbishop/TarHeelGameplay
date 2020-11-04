@@ -3,7 +3,7 @@ require(['templates', 'route', 'state', 'youtube'],
 
         // extract a YouTube VideoId from the URL if necessary
         function ytVideoId(id_or_url) {
-            var regExp = /^.*(youtube\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            var regExp = /^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
             var match = id_or_url.match(regExp);
             if (match && match[2].length == 11) {
               id_or_url = match[2];

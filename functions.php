@@ -310,7 +310,7 @@ function ParseGameplayPost($post) {
 
     $ytid = $res['ytid'] = get_post_meta($id, 'ytid', true);
     $res['duration'] = get_post_meta($id, 'duration', true);
-    if (!$res['duration']) $res['duration'] = '?';
+    if (!$res['duration']) $res['duration'] = '0';
     $res['language'] = get_post_meta($id, 'language', true);
     if (!$res['language']) $res['language'] = 'en';
     $res['audience'] = get_post_meta($id, 'audience', true);

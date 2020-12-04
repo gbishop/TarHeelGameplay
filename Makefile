@@ -1,11 +1,12 @@
-HOST=gbserver.cs.unc.edu
 
-dev: DOMAIN=test.tarheelgameplay.org
+dev: DOMAIN=dev.tarheelgameplay.org
 dev: SRC=.
+dev: HOST=gbserver-vm.cs.unc.edu
 dev: build copy
 
 production: DOMAIN=tarheelgameplay.org
 production: SRC=../Theme-build/
+production: HOST=gbserver.cs.unc.edu
 production: optimized copy
 
 copy:

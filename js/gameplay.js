@@ -196,7 +196,7 @@ define(["route", "state", "youtube"], function(route, state, youtube) {
             return;
         }
         var msg = new SpeechSynthesisUtterance(txt);
-        msg.lang = 'en';
+        msg.lang = 'en-US';
         speechSynthesis.speak(msg);
     }
 

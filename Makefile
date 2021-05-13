@@ -6,7 +6,7 @@ dev: build copy
 
 production: DOMAIN=tarheelgameplay.org
 production: SRC=../Theme-build/
-production: HOST=gbserver.cs.unc.edu
+production: HOST=gbserver-vm.cs.unc.edu
 production: optimized copy
 
 copy:

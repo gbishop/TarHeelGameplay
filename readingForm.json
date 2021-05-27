@@ -1,32 +1,40 @@
-{   "method": "get",
-    "controls": [
-        {   "label": "_(Randomize choices)",
-            "name": "randomize",
-            "select": true,
-            "options": [
-                { "label": "_(On)", "value": "1" },
-                { "label": "_(Off)", "value": "0" }
-            ]
-        },
-        {   "label": "_(Move prompts)",
-            "name": "moveprompts",
-            "select": true,
-            "options": [
-                { "label": "_(On)", "value": "1" },
-                { "label": "_(Off)", "value": "0" }
-            ]
-        },
-        {   "label": "_(Speech)",
-            "name": "speech",
-            "select": true,
-            "options": [
-                { "label": "_(On)", "value": "1" },
-                { "label": "_(Off)", "value": "0" }
-            ]
-        },
-        {   "input": true,
-            "type": "submit",
-            "value": "_(Done|button label)"
-        }
-    ]
+{
+  "method": "get",
+  "controls": [
+    {
+      "label": "_(Randomize choices)",
+      "name": "randomize",
+      "select": true,
+      "options": [
+        { "label": "_(On)", "value": "1" },
+        { "label": "_(Off)", "value": "0" }
+      ]
+    },
+    {
+      "label": "_(Move prompts)",
+      "name": "moveprompts",
+      "select": true,
+      "options": [
+        { "label": "_(On)", "value": "1" },
+        { "label": "_(Off)", "value": "0" }
+      ]
+    },
+    {
+      "label": "_(Speech)",
+      "name": "speech",
+      "select": true,
+      "options": [
+        { "label": "_(On)", "value": "1" },
+        { "label": "_(Off)", "value": "0" }
+      ]
+    },
+    {
+      "label": "",
+      "name": "voiceTest",
+      "input": true,
+      "type": "button",
+      "value": "_(Hear this voice)"
+    },
+    { "input": true, "type": "submit", "value": "_(Done|button label)" }
+  ]
 }

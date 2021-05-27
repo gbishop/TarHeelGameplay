@@ -15,10 +15,6 @@
         'textColor' => THR('textColor')
     );
     echo template_render('styleColor', $view);
-
-    if (THR('debug')) {
-        echo '    <script src="http://152.2.129.207:8080/target/target-script-min.js#anonymous"></script>';
-    }
     ?>
     <script src="/theme/js/modernizr.custom.js"></script>
     <script src="//code.jquery.com/jquery-2.1.1.min.js"></script>
@@ -28,7 +24,13 @@
         if (!window.console.log) window.console.log = function() {};
     </script>
     <script data-main="/theme/js/main" src="/theme/js/require.min.js"></script>
-    <script src="https://code.responsivevoice.org/responsivevoice.js"></script>
+    <script src="/theme/js/log.js"></script>
+<!--
+    <script>
+        log('log start');
+        window.onerror = log;
+    </script>
+-->
     <?php wp_head(); ?>
 
     <!-- Global site tag (gtag.js) - Google Analytics -->

@@ -5,7 +5,7 @@ Template Name: ReadingControls
 Allow users to configure reading
 */
 ?>
-<?php thr_header(''); ?>
+<?php thr_header('settings-page'); ?>
 <!-- reading-controls.php -->
 <?php
 

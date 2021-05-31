@@ -22,6 +22,7 @@ define([], function () {
   }
 
   let currentVoiceURI = localStorage.getItem("voiceURI");
+  let currentVoice = null;
 
   /**
    * Load a select control with options for available voices
@@ -39,6 +40,7 @@ define([], function () {
     // get the list of voices
     voices = await getVoices();
     // order them with English first
+    /*
     voices.sort((a, b) => {
       if (a.lang == "en-US" && b.lang == "en-US")
         return a.lang.localeCompare(b.lang);
@@ -48,10 +50,11 @@ define([], function () {
       if (b.lang.startsWith("en")) return 1;
       return 0;
     });
+    */
     /*
     log(
       "voices",
-      voices.map((voice) => voice.name)
+      voices.map((voice) => `${voice.name} ${voice.voiceURI}`)
     );
     */
     if (!currentVoiceURI) {
@@ -77,7 +80,7 @@ define([], function () {
       const option = select.selectedOptions[0];
       const name = option.getAttribute("data-name");
       currentVoiceURI = option.getAttribute("data-uri");
-      // log("voice changed to", name);
+      // log("voice changed to", name, currentVoiceURI);
       localStorage.setItem("voiceURI", currentVoiceURI);
     });
   }
@@ -90,11 +93,16 @@ define([], function () {
    */
   async function speak(text, options) {
     options = options || {};
-    // log("speak", text);
-    let start = performance.now();
-    const voices = await getVoices();
-    // log("get voices", performance.now() - start);
-    const voice = voices.find((voice) => voice.voiceURI == currentVoiceURI);
+    // log("speak", text, currentVoiceURI);
+    let voice;
+    if (currentVoice && currentVoice.voiceURI == currentVoiceURI) {
+      voice = currentVoice;
+    } else {
+      const voices = await getVoices();
+      voice = voices.find((voice) => voice.voiceURI == currentVoiceURI);
+      currentVoice = voice;
+    }
+    // log("got voice", voice && voice.name);
     const utterance = new SpeechSynthesisUtterance();
     utterances.push(utterance); // hack
     if (voice) utterance.voice = voice;

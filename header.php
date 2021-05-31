@@ -24,13 +24,13 @@
         if (!window.console.log) window.console.log = function() {};
     </script>
     <script data-main="/theme/js/main" src="/theme/js/require.min.js"></script>
+    <!--
     <script src="/theme/js/log.js"></script>
-<!--
     <script>
         log('log start');
         window.onerror = log;
     </script>
--->
+    -->
     <?php wp_head(); ?>
 
     <!-- Global site tag (gtag.js) - Google Analytics -->

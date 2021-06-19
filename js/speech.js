@@ -2,6 +2,9 @@ define([], function () {
   const SpeechStallThreshold = 1;
 
   const synth = speechSynthesis;
+  if (!synth) {
+    return { speak: function () {} };
+  }
 
   /** @type{SpeechSynthesisVoice[]} voices */
   let voices = [];
@@ -11,7 +14,7 @@ define([], function () {
    * @return {Promise<SpeechSynthesisVoice[]>} Available voices
    */
   function getVoices() {
-    return new Promise((resolve) => {
+    return new Promise(function (resolve) {
       function f() {
         voices = (voices.length && voices) || synth.getVoices();
         if (voices.length) resolve(voices);
@@ -22,66 +25,58 @@ define([], function () {
   }
 
   let currentVoiceURI = localStorage.getItem("voiceURI");
-  let currentVoice = null;
 
   /**
    * Load a select control with options for available voices
    *
-   * @async
    * @param {HTMLSelectElement} select - id of the select control
    * @return {Promise<void>}
    */
-  async function populateVoiceList(select) {
+  function populateVoiceList(select) {
     if (!select) return;
     // empty before refilling
     while (select.firstChild) {
       select.removeChild(select.firstChild);
     }
     // get the list of voices
-    voices = await getVoices();
-    // order them with English first
-    /*
-    voices.sort((a, b) => {
-      if (a.lang == "en-US" && b.lang == "en-US")
-        return a.lang.localeCompare(b.lang);
-      if (a.lang == "en-US") return -1;
-      if (b.lang == "en-US") return 1;
-      if (a.lang.startsWith("en")) return -1;
-      if (b.lang.startsWith("en")) return 1;
-      return 0;
-    });
-    */
-    /*
+    getVoices().then(function (voices) {
+      /*
     log(
       "voices",
       voices.map((voice) => `${voice.name} ${voice.voiceURI}`)
     );
     */
-    if (!currentVoiceURI) {
-      currentVoiceURI = voices[0].voiceURI;
-      localStorage.setItem("voiceURI", currentVoiceURI);
-    }
-    select.options[0] = new Option("Off", "0", false, currentVoiceURI == "Off");
-    select.options[0].setAttribute("data-name", "Off");
-    select.options[0].setAttribute("data-uri", "Off");
-    for (const voice of voices) {
-      const option = new Option(
-        `${voice.name} (${voice.lang})`,
-        "1",
+      if (!currentVoiceURI) {
+        currentVoiceURI = voices[0].voiceURI;
+        localStorage.setItem("voiceURI", currentVoiceURI);
+      }
+      select.options[0] = new Option(
+        "Off",
+        "0",
         false,
-        voice.voiceURI == currentVoiceURI
+        currentVoiceURI == "Off"
       );
-      option.setAttribute("data-name", voice.name);
-      option.setAttribute("data-uri", voice.voiceURI);
-      select.appendChild(option);
-    }
-    // handle voice changes
-    select.addEventListener("change", () => {
-      const option = select.selectedOptions[0];
-      const name = option.getAttribute("data-name");
-      currentVoiceURI = option.getAttribute("data-uri");
-      // log("voice changed to", name, currentVoiceURI);
-      localStorage.setItem("voiceURI", currentVoiceURI);
+      select.options[0].setAttribute("data-name", "Off");
+      select.options[0].setAttribute("data-uri", "Off");
+      for (const voice of voices) {
+        const option = new Option(
+          `${voice.name} (${voice.lang})`,
+          "1",
+          false,
+          voice.voiceURI == currentVoiceURI
+        );
+        option.setAttribute("data-name", voice.name);
+        option.setAttribute("data-uri", voice.voiceURI);
+        select.appendChild(option);
+      }
+      // handle voice changes
+      select.addEventListener("change", function () {
+        const option = select.selectedOptions[0];
+        currentVoiceURI = option.getAttribute("data-uri");
+        // const name = option.getAttribute("data-name");
+        // log("voice changed to", name, currentVoiceURI);
+        localStorage.setItem("voiceURI", currentVoiceURI);
+      });
     });
   }
 
@@ -91,77 +86,84 @@ define([], function () {
    * @param {string} text
    * @returns {Promise<utterance>}
    */
-  async function speak(text, options) {
+  function speak(text, options) {
     options = options || {};
     // log("speak", text, currentVoiceURI);
-    let voice;
-    if (currentVoice && currentVoice.voiceURI == currentVoiceURI) {
-      voice = currentVoice;
-    } else {
-      const voices = await getVoices();
-      voice = voices.find((voice) => voice.voiceURI == currentVoiceURI);
-      currentVoice = voice;
-    }
-    // log("got voice", voice && voice.name);
-    const utterance = new SpeechSynthesisUtterance();
-    utterances.push(utterance); // hack
-    if (voice) utterance.voice = voice;
-    for (const option of Object.keys(options)) {
-      utterance[option] = options[option];
-    }
-    utterance.text = text;
-    utterance.lang = (voice && voice.lang) || "en-US";
-
-    /*
-    utterance.addEventListener("end", () => log(`end ${text}`));
-    utterance.addEventListener("start", () => log(`start ${text}`));
-    utterance.addEventListener("error", () => log(`error ${text}`));
-    */
-
-    synth.cancel(); // cancel current speak, if any is running
-    return new Promise((resolve) => {
-      let started = false;
-      let error = null;
-      let startTime = performance.now();
-      utterance.addEventListener("start", () => (started = true));
-      utterance.addEventListener("error", (e) => (error = e));
-      function waitForTheSpeech() {
-        // log("wait for the speech");
-        if (synth.speaking || started) resolve(utterance);
-        else if (
-          error ||
-          performance.now() - startTime > SpeechStallThreshold
-        ) {
-          // log("stalled");
-          const id = "SpeechPlayButton";
-          let button = document.getElementById(id);
-          if (!button) {
-            button = document.createElement("button");
-            button.id = id;
-            button.innerText = "Play";
-            document.body.appendChild(button);
-          }
-          button.style.position = "fixed";
-          button.style.top = "50vh";
-          button.style.left = "50vw";
-          button.style.transform = "translate(-50%, -50%)";
-          button.style.background = "#ff0";
-          button.style.padding = "0.3em";
-          button.style.borderRadius = "0.3em";
-          button.style.fontSize = "4em";
-          button.onclick = () => {
-            // log("break stall");
-            synth.speak(utterance);
-            button.style.display = "none";
-            resolve(utterance);
-          };
-        } else {
-          setTimeout(waitForTheSpeech, 100);
-        }
+    return getVoices().then(function (voices) {
+      let voice = voices.find(function (voice) {
+        return voice.voiceURI == currentVoiceURI;
+      });
+      // log("got voice", voice && voice.name);
+      const utterance = new SpeechSynthesisUtterance();
+      utterances.push(utterance); // hack
+      if (voice) utterance.voice = voice;
+      for (const option of Object.keys(options)) {
+        utterance[option] = options[option];
       }
-      // log("calling synth.speak");
-      synth.speak(utterance);
-      waitForTheSpeech();
+      utterance.text = text;
+      utterance.lang = (voice && voice.lang) || "en-US";
+
+      /*
+      utterance.addEventListener("end", function () {
+        log(`end ${text}`);
+      });
+      utterance.addEventListener("start", function () {
+        log(`start ${text}`);
+      });
+      utterance.addEventListener("error", function () {
+        log(`error ${text}`);
+      });
+      */
+
+      synth.cancel(); // cancel current speak, if any is running
+      return new Promise(function (resolve) {
+        let started = false;
+        let error = null;
+        let startTime = performance.now();
+        utterance.addEventListener("start", function () {
+          started = true;
+        });
+        utterance.addEventListener("error", function (e) {
+          error = e;
+        });
+        function waitForTheSpeech() {
+          // log("wait for the speech");
+          if (synth.speaking || started) resolve(utterance);
+          else if (
+            error ||
+            performance.now() - startTime > SpeechStallThreshold
+          ) {
+            // log("stalled");
+            const id = "SpeechPlayButton";
+            let button = document.getElementById(id);
+            if (!button) {
+              button = document.createElement("button");
+              button.id = id;
+              button.innerText = "Play";
+              document.body.appendChild(button);
+            }
+            button.style.position = "fixed";
+            button.style.top = "50vh";
+            button.style.left = "50vw";
+            button.style.transform = "translate(-50%, -50%)";
+            button.style.background = "#ff0";
+            button.style.padding = "0.3em";
+            button.style.borderRadius = "0.3em";
+            button.style.fontSize = "4em";
+            button.onclick = function () {
+              // log("break stall");
+              synth.speak(utterance);
+              button.style.display = "none";
+              resolve(utterance);
+            };
+          } else {
+            setTimeout(waitForTheSpeech, 100);
+          }
+        }
+        // log("calling synth.speak");
+        synth.speak(utterance);
+        waitForTheSpeech();
+      });
     });
   }
 
@@ -173,12 +175,16 @@ define([], function () {
       populateVoiceList(select);
     }
     if (speechSynthesis.onvoiceschanged !== undefined) {
-      speechSynthesis.onvoiceschanged = () => populateVoiceList(select);
+      speechSynthesis.onvoiceschanged = function () {
+        populateVoiceList(select);
+      };
     }
     document
       .querySelector("input[name=voiceTest]")
-      .addEventListener("click", () => {
-        const voice = voices.find((voice) => voice.voiceURI == currentVoiceURI);
+      .addEventListener("click", function () {
+        const voice = voices.find(function (voice) {
+          return voice.voiceURI == currentVoiceURI;
+        });
         if (voice) speak(`This voice is ${voice.name}`);
       });
   });

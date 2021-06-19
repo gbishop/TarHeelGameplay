@@ -4,6 +4,11 @@ dev: SRC=.
 dev: HOST=gbserver-vm.cs.unc.edu
 dev: build copy
 
+test: DOMAIN=dev.tarheelgameplay.org
+test: SRC=../Theme-build/
+test: HOST=gbserver-vm.cs.unc.edu
+test: optimized copy
+
 production: DOMAIN=tarheelgameplay.org
 production: SRC=../Theme-build/
 production: HOST=gbserver-vm.cs.unc.edu
@@ -40,8 +45,8 @@ translate:
 
 optimized: build
 	rm -rf ../Theme-build/*
-	node ../r.js -o js/app.build.js
-	cp --parents -r *.php *.json js/main-combined.js js/modernizr.custom.js js/require.min.js *.png images style.css Makefile ../Theme-build
+	r.js -o js/app.build.js
+	cp --parents -r *.php *.json js/main-combined.js js/modernizr.custom.js js/require.min.js js/log.js *.png images style.css Makefile ../Theme-build
 	mv ../Theme-build/js/main-combined.js ../Theme-build/js/main.js
 	make versioned
 

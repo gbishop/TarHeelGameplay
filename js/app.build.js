@@ -1,5 +1,5 @@
 ({
-    out: "main-combined.js",
-    preserveLicenseComments: false,
-    name: "main"
-})
+  out: "main-combined.js",
+  preserveLicenseComments: false,
+  name: "main",
+});

@@ -17,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         echo $output;
         die;
     }
-    if ( is_wp_error($user) ) {
+    if (is_wp_error($user)) {
         $view['failed'] = 1;
     } else {
         $goto = getParam('redirect_to', '/', '/^\/([-a-z]+\/)?$/', 'post');
@@ -33,6 +33,7 @@ if ($out) {
 $view['logged_in'] = is_user_logged_in();
 $view['admin'] = is_admin();
 $view['logoutURL'] = '/login/?out=1';
+$view['wplogin'] = wp_login_url();
 $goto = getParam('goto', '/', '/^[-a-z]+$/');
 if ($goto != '/') {
     $goto = '/' . $goto . '/';

@@ -33,18 +33,15 @@
     -->
     <?php wp_head(); ?>
 
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-66271805-1"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
+        <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-3E7WZB849P"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
 
-        function gtag() {
-            dataLayer.push(arguments);
-        }
-        gtag('js', new Date());
-
-        gtag('config', 'UA-66271805-1');
-    </script>
+  gtag('config', 'G-3E7WZB849P');
+</script>
 
     <script>
         function logMessage(msg) {
@@ -52,11 +49,11 @@
         }
 
         function logEvent(category, action, label, value) {
-            gtag('event', action, {
-                event_category: category,
-                event_label: label,
-                event_value: value
-            });
+            // gtag('event', action, {
+            //     event_category: category,
+            //     event_label: label,
+            //     event_value: value
+            // });
             console.log('logEvent', category, action, label, value);
         }
     </script>

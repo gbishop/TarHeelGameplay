@@ -45,7 +45,7 @@ translate:
 
 optimized: build
 	rm -rf ../Theme-build/*
-	r.js -o js/app.build.js
+	node ../r.js -o js/app.build.js
 	cp --parents -r *.php *.json js/main-combined.js js/modernizr.custom.js js/require.min.js js/log.js *.png images style.css Makefile ../Theme-build
 	mv ../Theme-build/js/main-combined.js ../Theme-build/js/main.js
 	make versioned

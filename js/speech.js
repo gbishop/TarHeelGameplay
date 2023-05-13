@@ -58,9 +58,11 @@ define([], function () {
       );
       select.options[0].setAttribute("data-name", "Off");
       select.options[0].setAttribute("data-uri", "Off");
-      for (const voice of voices) {
+      var i;
+      for (i = 0; i < voices.length; i++) {
+        const voice = voices[i];
         const option = new Option(
-          `${voice.name} (${voice.lang})`,
+          voice.name + " " + voice.lang,
           "1",
           false,
           voice.voiceURI == currentVoiceURI
@@ -97,8 +99,11 @@ define([], function () {
       const utterance = new SpeechSynthesisUtterance();
       utterances.push(utterance); // hack
       if (voice) utterance.voice = voice;
-      for (const option of Object.keys(options)) {
-        utterance[option] = options[option];
+      var keys = Object.keys(options);
+      var i;
+      for (i=0; i < keys.length; i++) {
+        const key = keys[i];
+        utterance[key] = options[key];
       }
       utterance.text = text;
       utterance.lang = (voice && voice.lang) || "en-US";
@@ -185,9 +190,9 @@ define([], function () {
         const voice = voices.find(function (voice) {
           return voice.voiceURI == currentVoiceURI;
         });
-        if (voice) speak(`This voice is ${voice.name}`);
+        if (voice) speak("This voice is " + voice.name);
       });
   });
 
-  return { speak };
+  return { speak: speak };
 });

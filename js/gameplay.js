@@ -242,7 +242,7 @@ define(["route", "state", "youtube", "speech"], function (
         '<tr><td><a href="#">' + choices[i].prompt + "</a></td></tr>"
       );
       $tr.data("next", choices[i].next);
-      if (i === 0) {
+      if (i === 0 && state.get("hover") == "0") {
         $tr.addClass("selected");
       }
       $message.append($tr);
@@ -371,6 +371,56 @@ define(["route", "state", "youtube", "speech"], function (
       evt.preventDefault();
       down[evt.keyCode] = false;
     });
+
+    if (state.get("hover") != "0") initHover();
+  }
+
+  function initHover() {
+    var over = null;
+    var timeStamp = 0;
+    var accumulators = new Map();
+    var threshold = +(state.get("hover") || "0") * 500;
+
+    /** @param {PointerEvent} event */
+    function handlePointerEvent(event) {
+      if (!timeStamp) {
+        timeStamp = event.timeStamp;
+      }
+      var dt = event.timeStamp - timeStamp;
+      timeStamp = event.timeStamp;
+
+      // increment the accumulator for the target we are over
+      var sum = accumulators.get(over) || 0;
+      sum += dt;
+      accumulators.set(over, sum);
+      // if it exceeds the threshold issue a click event
+      if (sum > threshold) {
+        if (over) {
+          over.click();
+        }
+      }
+      // decrement the other accumulators
+      accumulators.forEach(function (value, target, map) {
+        if (target !== over) {
+          value -= dt;
+          if (value < 0) {
+            map.delete(target);
+          } else {
+            map.set(target, value);
+          }
+        }
+      });
+      if (event.type == "pointerover") {
+        over = event.target;
+      } else if (event.type == "pointerout") {
+        over = null;
+      }
+    }
+    document.addEventListener("pointerover", handlePointerEvent);
+    document.addEventListener("pointerout", handlePointerEvent);
+    setInterval(function () {
+      handlePointerEvent(new PointerEvent("step"));
+    }, 100);
   }
 
   route.add("init", /^\/play\/.*/, init);

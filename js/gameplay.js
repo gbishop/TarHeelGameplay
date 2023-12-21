@@ -149,7 +149,7 @@ define(["route", "state", "youtube", "speech"], function (
     }
     var t = player.getCurrentTime();
     if (!t) return;
-    if (t >= nextTimePoint.time) {
+    if (nextTimePoint && t >= nextTimePoint.time) {
       atTimePoint(t);
     }
   }
@@ -182,7 +182,7 @@ define(["route", "state", "youtube", "speech"], function (
   // process timePoint events
   function atTimePoint(t) {
     //console.log('atTP', t, nextTimePoint);
-    if ("choices" in nextTimePoint) {
+    if (nextTimePoint && "choices" in nextTimePoint) {
       player.pauseVideo();
       showPrompt();
       return;
@@ -397,6 +397,7 @@ define(["route", "state", "youtube", "speech"], function (
       if (sum > threshold) {
         if (over) {
           over.click();
+          over = null;
         }
       }
       // decrement the other accumulators
@@ -410,7 +411,11 @@ define(["route", "state", "youtube", "speech"], function (
           }
         }
       });
-      if (event.type == "pointerover") {
+      if (
+        event.type == "pointerover" &&
+        event.target instanceof HTMLAnchorElement &&
+        over != event.target
+      ) {
         over = event.target;
       } else if (event.type == "pointerout") {
         over = null;
